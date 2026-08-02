@@ -4,11 +4,13 @@ import com.sunnyvet.main.domain.dto.AppointmentDto;
 import com.sunnyvet.main.domain.entity.Appointment;
 import com.sunnyvet.main.domain.entity.Doctor;
 import com.sunnyvet.main.domain.entity.Pet;
+import com.sunnyvet.main.event.AppointmentCreatedEvent;
 import com.sunnyvet.main.exception.ResourceNotFoundException;
 import com.sunnyvet.main.repository.AppointmentRepository;
 import com.sunnyvet.main.repository.DoctorRepository;
 import com.sunnyvet.main.repository.PetRepository;
 import com.sunnyvet.main.service.AppointmentService;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -22,15 +24,18 @@ public class AppointmentServiceImpl implements AppointmentService {
     private final PetRepository petRepository;
     private final DoctorRepository doctorRepository;
     private final KafkaTemplate<String, String> kafkaTemplate;
+    private final ApplicationEventPublisher eventPublisher;
 
     public AppointmentServiceImpl(AppointmentRepository appointmentRepository,
                                   PetRepository petRepository,
                                   DoctorRepository doctorRepository,
-                                  KafkaTemplate<String, String> kafkaTemplate) {
+                                  KafkaTemplate<String, String> kafkaTemplate,
+                                  ApplicationEventPublisher eventPublisher) {
         this.appointmentRepository = appointmentRepository;
         this.petRepository = petRepository;
         this.doctorRepository = doctorRepository;
         this.kafkaTemplate = kafkaTemplate;
+        this.eventPublisher = eventPublisher;
     }
 
     @Override
@@ -50,6 +55,7 @@ public class AppointmentServiceImpl implements AppointmentService {
         Appointment savedAppointment = appointmentRepository.save(appointment);
 
         kafkaTemplate.send("appointments-topic", "New appointment booked: " + savedAppointment.getId());
+        eventPublisher.publishEvent(new AppointmentCreatedEvent(this, savedAppointment.getId()));
 
         return mapToDto(savedAppointment);
     }
