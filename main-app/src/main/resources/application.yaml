@@ -1,0 +1,23 @@
+server:
+  port: 8080
+spring:
+  application:
+    name: main-app
+  datasource:
+    url: jdbc:postgresql://localhost:5432/sunnyvet
+    username: root
+    password: rootpassword
+    driver-class-name: org.postgresql.Driver
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: true
+    properties:
+      hibernate:
+        format_sql: true
+  data:
+    redis:
+      host: localhost
+      port: 6379
+  kafka:
+    bootstrap-servers: localhost:9092
