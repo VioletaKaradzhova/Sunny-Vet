@@ -4,7 +4,7 @@ spring:
   application:
     name: main-app
   datasource:
-    url: jdbc:postgresql://localhost:5432/sunnyvet
+    url: jdbc:postgresql://localhost:5433/sunnyvet
     username: root
     password: rootpassword
     driver-class-name: org.postgresql.Driver
