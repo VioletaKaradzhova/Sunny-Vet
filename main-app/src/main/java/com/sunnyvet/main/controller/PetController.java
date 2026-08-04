@@ -29,16 +29,17 @@ public class PetController {
     @PostMapping
     public ResponseEntity<EntityModel<PetDto>> createPet(@Valid @RequestBody PetDto petDto) {
         PetDto createdPet = petService.createPet(petDto);
-        EntityModel<PetDto> entityModel = EntityModel.of(createdPet);
-        entityModel.add(WebMvcLinkBuilder.linkTo(WebMvcLinkBuilder.methodOn(PetController.class).getPet(createdPet.getId())).withSelfRel());
-        return new ResponseEntity<>(entityModel, HttpStatus.CREATED);
+        return new ResponseEntity<>(toModel(createdPet), HttpStatus.CREATED);
     }
 
     @GetMapping("/{id}")
     public ResponseEntity<EntityModel<PetDto>> getPet(@PathVariable UUID id) {
         PetDto pet = petService.getPetById(id);
-        EntityModel<PetDto> entityModel = EntityModel.of(pet);
-        entityModel.add(WebMvcLinkBuilder.linkTo(WebMvcLinkBuilder.methodOn(PetController.class).getPet(id)).withSelfRel());
-        return ResponseEntity.ok(entityModel);
+        return ResponseEntity.ok(toModel(pet));
+    }
+
+    private EntityModel<PetDto> toModel(PetDto petDto) {
+        return EntityModel.of(petDto,
+                WebMvcLinkBuilder.linkTo(WebMvcLinkBuilder.methodOn(PetController.class).getPet(petDto.getId())).withSelfRel());
     }
 }
