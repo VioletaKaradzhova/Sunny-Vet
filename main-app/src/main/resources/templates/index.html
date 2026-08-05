@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title th:text="${pageTitle}">SunnyVet Clinic</title>
+</head>
+<body>
+<header>
+    <nav>
+        <ul>
+            <li><a th:href="@{/}">Home</a></li>
+            <li><a th:href="@{/pets}">Pets</a></li>
+            <li><a th:href="@{/appointments}">Appointments</a></li>
+        </ul>
+    </nav>
+</header>
+<main>
+    <h1>Welcome to SunnyVet Clinic</h1>
+    <div>
+        <a th:href="@{/appointments/new}">Book an Appointment</a>
+    </div>
+</main>
+</body>
+</html>
