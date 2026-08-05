@@ -2,8 +2,10 @@ package com.sunnyvet.main.web;
 
 import com.sunnyvet.main.domain.dto.PetDto;
 import com.sunnyvet.main.service.PetService;
+import jakarta.validation.Valid;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -32,7 +34,10 @@ public class PetWebController {
     }
 
     @PostMapping
-    public String createPet(@ModelAttribute PetDto petDto) {
+    public String createPet(@Valid @ModelAttribute("pet") PetDto petDto, BindingResult bindingResult) {
+        if (bindingResult.hasErrors()) {
+            return "pets/new";
+        }
         petService.createPet(petDto);
         return "redirect:/pets";
     }

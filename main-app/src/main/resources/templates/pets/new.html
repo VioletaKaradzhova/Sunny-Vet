@@ -8,19 +8,23 @@
     <form th:action="@{/pets}" th:object="${pet}" method="post">
         <div>
             <label for="name">Name:</label>
-            <input type="text" id="name" th:field="*{name}" required>
+            <input type="text" id="name" th:field="*{name}">
+            <span th:if="${#fields.hasErrors('name')}" th:errors="*{name}" style="color: red;"></span>
         </div>
         <div>
             <label for="species">Species:</label>
-            <input type="text" id="species" th:field="*{species}" required>
+            <input type="text" id="species" th:field="*{species}">
+            <span th:if="${#fields.hasErrors('species')}" th:errors="*{species}" style="color: red;"></span>
         </div>
         <div>
             <label for="age">Age:</label>
-            <input type="number" id="age" th:field="*{age}" required>
+            <input type="number" id="age" th:field="*{age}">
+            <span th:if="${#fields.hasErrors('age')}" th:errors="*{age}" style="color: red;"></span>
         </div>
         <div>
             <label for="ownerId">Owner ID:</label>
-            <input type="text" id="ownerId" th:field="*{ownerId}" required>
+            <input type="text" id="ownerId" th:field="*{ownerId}">
+            <span th:if="${#fields.hasErrors('ownerId')}" th:errors="*{ownerId}" style="color: red;"></span>
         </div>
         <button type="submit">Save</button>
     </form>

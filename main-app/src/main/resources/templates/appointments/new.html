@@ -8,19 +8,23 @@
     <form th:action="@{/appointments}" th:object="${appointment}" method="post">
         <div>
             <label for="petId">Pet ID:</label>
-            <input type="text" id="petId" th:field="*{petId}" required>
+            <input type="text" id="petId" th:field="*{petId}">
+            <span th:if="${#fields.hasErrors('petId')}" th:errors="*{petId}" style="color: red;"></span>
         </div>
         <div>
             <label for="doctorId">Doctor ID:</label>
-            <input type="text" id="doctorId" th:field="*{doctorId}" required>
+            <input type="text" id="doctorId" th:field="*{doctorId}">
+            <span th:if="${#fields.hasErrors('doctorId')}" th:errors="*{doctorId}" style="color: red;"></span>
         </div>
         <div>
             <label for="appointmentTime">Date & Time:</label>
-            <input type="datetime-local" id="appointmentTime" th:field="*{appointmentTime}" required>
+            <input type="datetime-local" id="appointmentTime" th:field="*{appointmentTime}">
+            <span th:if="${#fields.hasErrors('appointmentTime')}" th:errors="*{appointmentTime}" style="color: red;"></span>
         </div>
         <div>
             <label for="reason">Reason:</label>
-            <input type="text" id="reason" th:field="*{reason}" required>
+            <input type="text" id="reason" th:field="*{reason}">
+            <span th:if="${#fields.hasErrors('reason')}" th:errors="*{reason}" style="color: red;"></span>
         </div>
         <button type="submit">Book</button>
     </form>
