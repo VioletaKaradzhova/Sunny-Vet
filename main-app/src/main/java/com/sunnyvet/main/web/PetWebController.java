@@ -1,9 +1,12 @@
 package com.sunnyvet.main.web;
 
+import com.sunnyvet.main.domain.dto.PetDto;
 import com.sunnyvet.main.service.PetService;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 
 @Controller
@@ -20,5 +23,17 @@ public class PetWebController {
     public String listPets(Model model) {
         model.addAttribute("pets", petService.getAllPets());
         return "pets/list";
+    }
+
+    @GetMapping("/new")
+    public String showCreateForm(Model model) {
+        model.addAttribute("pet", new PetDto());
+        return "pets/new";
+    }
+
+    @PostMapping
+    public String createPet(@ModelAttribute PetDto petDto) {
+        petService.createPet(petDto);
+        return "redirect:/pets";
     }
 }

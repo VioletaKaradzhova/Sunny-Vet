@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/layout :: head('Book Appointment - SunnyVet Clinic')}"></head>
+<body>
+<header th:replace="~{fragments/layout :: header}"></header>
+<main>
+    <h1>Book an Appointment</h1>
+    <form th:action="@{/appointments}" th:object="${appointment}" method="post">
+        <div>
+            <label for="petId">Pet ID:</label>
+            <input type="text" id="petId" th:field="*{petId}" required>
+        </div>
+        <div>
+            <label for="doctorId">Doctor ID:</label>
+            <input type="text" id="doctorId" th:field="*{doctorId}" required>
+        </div>
+        <div>
+            <label for="appointmentTime">Date & Time:</label>
+            <input type="datetime-local" id="appointmentTime" th:field="*{appointmentTime}" required>
+        </div>
+        <div>
+            <label for="reason">Reason:</label>
+            <input type="text" id="reason" th:field="*{reason}" required>
+        </div>
+        <button type="submit">Book</button>
+    </form>
+</main>
+</body>
+</html>

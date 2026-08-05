@@ -1,19 +1,11 @@
 <!DOCTYPE html>
 <html lang="en" xmlns:th="http://www.thymeleaf.org">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Registered Pets - SunnyVet Clinic</title>
-</head>
+<head th:replace="~{fragments/layout :: head('Registered Pets - SunnyVet Clinic')}"></head>
 <body>
-<header>
-    <nav>
-        <a th:href="@{/}">Home</a>
-        <a th:href="@{/pets}">Pets</a>
-    </nav>
-</header>
+<header th:replace="~{fragments/layout :: header}"></header>
 <main>
     <h1>Registered Pets</h1>
+    <a th:href="@{/pets/new}">Register New Pet</a>
     <table>
         <thead>
         <tr>

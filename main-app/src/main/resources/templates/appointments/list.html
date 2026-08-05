@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/layout :: head('Appointments - SunnyVet Clinic')}"></head>
+<body>
+<header th:replace="~{fragments/layout :: header}"></header>
+<main>
+    <h1>Scheduled Appointments</h1>
+    <a th:href="@{/appointments/new}">Book New Appointment</a>
+    <table>
+        <thead>
+        <tr>
+            <th>Date & Time</th>
+            <th>Pet ID</th>
+            <th>Doctor ID</th>
+            <th>Reason</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr th:each="appointment : ${appointments}">
+            <td th:text="${#temporals.format(appointment.appointmentTime, 'yyyy-MM-dd HH:mm')}"></td>
+            <td th:text="${appointment.petId}"></td>
+            <td th:text="${appointment.doctorId}"></td>
+            <td th:text="${appointment.reason}"></td>
+        </tr>
+        </tbody>
+    </table>
+</main>
+</body>
+</html>
