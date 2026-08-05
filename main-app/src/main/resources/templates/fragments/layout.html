@@ -12,6 +12,11 @@
             <li><a th:href="@{/}">Home</a></li>
             <li><a th:href="@{/pets}">Pets</a></li>
             <li><a th:href="@{/appointments}">Appointments</a></li>
+            <li>
+                <form th:action="@{/logout}" method="post" style="display: inline;">
+                    <button type="submit">Logout</button>
+                </form>
+            </li>
         </ul>
     </nav>
 </header>
