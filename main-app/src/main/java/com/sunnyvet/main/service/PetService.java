@@ -7,5 +7,7 @@ import java.util.UUID;
 public interface PetService {
     PetDto createPet(PetDto petDto);
     PetDto getPetById(UUID id);
-    List<PetDto> getPetsByOwnerId(UUID ownerId);
+    List<PetDto> getAllPets();
+    PetDto updatePet(UUID id, PetDto petDto);
+    void deletePet(UUID id);
 }

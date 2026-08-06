@@ -4,11 +4,8 @@ import com.sunnyvet.main.domain.dto.PetDto;
 import com.sunnyvet.main.domain.entity.Owner;
 import com.sunnyvet.main.domain.entity.Pet;
 import com.sunnyvet.main.exception.ResourceNotFoundException;
-import com.sunnyvet.main.repository.OwnerRepository;
 import com.sunnyvet.main.repository.PetRepository;
 import com.sunnyvet.main.service.PetService;
-import org.springframework.cache.annotation.CacheEvict;
-import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -19,42 +16,64 @@ import java.util.stream.Collectors;
 public class PetServiceImpl implements PetService {
 
     private final PetRepository petRepository;
-    private final OwnerRepository ownerRepository;
 
-    public PetServiceImpl(PetRepository petRepository, OwnerRepository ownerRepository) {
+    public PetServiceImpl(PetRepository petRepository) {
         this.petRepository = petRepository;
-        this.ownerRepository = ownerRepository;
     }
 
     @Override
-    @CacheEvict(value = "pets", allEntries = true)
     public PetDto createPet(PetDto petDto) {
-        Owner owner = ownerRepository.findById(petDto.getOwnerId())
-                .orElseThrow(() -> new ResourceNotFoundException("Owner not found"));
-
         Pet pet = new Pet();
         pet.setName(petDto.getName());
         pet.setSpecies(petDto.getSpecies());
         pet.setAge(petDto.getAge());
-        pet.setOwner(owner);
+
+        if (petDto.getOwnerId() != null) {
+            Owner owner = new Owner();
+            owner.setId(petDto.getOwnerId());
+            pet.setOwner(owner);
+        }
 
         Pet savedPet = petRepository.save(pet);
         return mapToDto(savedPet);
     }
 
     @Override
-    @Cacheable(value = "pets", key = "#id")
     public PetDto getPetById(UUID id) {
         Pet pet = petRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("Pet not found"));
+                .orElseThrow(() -> new ResourceNotFoundException("Pet not found with ID: " + id));
         return mapToDto(pet);
     }
 
     @Override
-    public List<PetDto> getPetsByOwnerId(UUID ownerId) {
-        return petRepository.findByOwnerId(ownerId).stream()
+    public List<PetDto> getAllPets() {
+        return petRepository.findAll().stream()
                 .map(this::mapToDto)
                 .collect(Collectors.toList());
+    }
+
+    @Override
+    public PetDto updatePet(UUID id, PetDto petDto) {
+        Pet pet = petRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Pet not found with ID: " + id));
+
+        pet.setName(petDto.getName());
+        pet.setSpecies(petDto.getSpecies());
+        pet.setAge(petDto.getAge());
+
+        if (petDto.getOwnerId() != null) {
+            Owner owner = new Owner();
+            owner.setId(petDto.getOwnerId());
+            pet.setOwner(owner);
+        }
+
+        Pet updatedPet = petRepository.save(pet);
+        return mapToDto(updatedPet);
+    }
+
+    @Override
+    public void deletePet(UUID id) {
+        petRepository.deleteById(id);
     }
 
     private PetDto mapToDto(Pet pet) {
@@ -63,7 +82,9 @@ public class PetServiceImpl implements PetService {
         dto.setName(pet.getName());
         dto.setSpecies(pet.getSpecies());
         dto.setAge(pet.getAge());
-        dto.setOwnerId(pet.getOwner().getId());
+        if (pet.getOwner() != null) {
+            dto.setOwnerId(pet.getOwner().getId());
+        }
         return dto;
     }
 }
