@@ -10,11 +10,12 @@ import org.springframework.security.web.SecurityFilterChain;
 public class UiSecurityConfig {
 
     @Bean
-    @Order(2)
+    @Order(0)
     public SecurityFilterChain uiSecurityFilterChain(HttpSecurity http) throws Exception {
         http
+                .securityMatcher("/", "/about", "/login", "/logout", "/pets", "/pets/**", "/appointments", "/appointments/**", "/css/**", "/js/**", "/images/**", "/error")
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/login", "/css/**", "/js/**", "/images/**", "/error").permitAll()
+                        .requestMatchers("/", "/about", "/login", "/css/**", "/js/**", "/images/**", "/error").permitAll()
                         .anyRequest().authenticated()
                 )
                 .formLogin(form -> form

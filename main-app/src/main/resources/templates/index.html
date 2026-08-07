@@ -1,13 +1,20 @@
 <!DOCTYPE html>
-<html lang="en" xmlns:th="http://www.thymeleaf.org">
-<head th:replace="~{fragments/layout :: head('SunnyVet Clinic - Home')}"></head>
+<html th:replace="~{fragments/layout :: layout(~{::title}, ~{::section})}" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Home - Sunny Vet Clinic</title>
+</head>
 <body>
-<header th:replace="~{fragments/layout :: header}"></header>
-<main>
-    <h1>Welcome to SunnyVet Clinic</h1>
-    <div>
-        <a th:href="@{/appointments/new}">Book an Appointment</a>
+<section class="container">
+    <div class="p-5 mb-4 bg-white rounded-3 shadow-sm border">
+        <div class="container-fluid py-5 text-center">
+            <h1 class="display-5 fw-bold text-primary">Welcome to Sunny Vet Clinic</h1>
+            <p class="col-md-8 mx-auto fs-4 text-muted">Providing compassionate and expert care for your furry family members.</p>
+            <div class="mt-4">
+                <a th:href="@{/appointments/new}" class="btn btn-primary btn-lg px-4 me-2">Book an Appointment</a>
+                <a th:href="@{/about}" class="btn btn-outline-secondary btn-lg px-4">Learn More</a>
+            </div>
+        </div>
     </div>
-</main>
+</section>
 </body>
 </html>
