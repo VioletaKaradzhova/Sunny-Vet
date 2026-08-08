@@ -1,31 +1,42 @@
 <!DOCTYPE html>
-<html lang="en" xmlns:th="http://www.thymeleaf.org">
-<head th:replace="~{fragments/layout :: head('Registered Pets - SunnyVet Clinic')}"></head>
+<html th:replace="~{fragments/layout :: layout(~{::title}, ~{::section})}" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Registered Pets - Sunny Vet Clinic</title>
+</head>
 <body>
-<header th:replace="~{fragments/layout :: header}"></header>
-<main>
-    <h1>Registered Pets</h1>
-    <a th:href="@{/pets/new}">Register New Pet</a>
-    <table>
-        <thead>
-        <tr>
-            <th>Name</th>
-            <th>Species</th>
-            <th>Age</th>
-            <th>Actions</th>
-        </tr>
-        </thead>
-        <tbody>
-        <tr th:each="pet : ${pets}">
-            <td th:text="${pet.name}"></td>
-            <td th:text="${pet.species}"></td>
-            <td th:text="${pet.age}"></td>
-            <td>
-                <a th:href="@{/pets/{id}(id=${pet.id})}">View Details</a>
-            </td>
-        </tr>
-        </tbody>
-    </table>
-</main>
+<section class="container">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2 class="text-primary">Registered Pets</h2>
+        <a th:href="@{/pets/new}" class="btn btn-success">Add New Pet</a>
+    </div>
+
+    <div class="card shadow-sm border-0">
+        <div class="card-body">
+            <table class="table table-hover align-middle">
+                <thead class="table-light">
+                <tr>
+                    <th>Name</th>
+                    <th>Species</th>
+                    <th>Age</th>
+                    <th>Actions</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr th:each="pet : ${pets}">
+                    <td class="fw-bold" th:text="${pet.name}">Pet Name</td>
+                    <td th:text="${pet.species}">Species</td>
+                    <td th:text="${pet.age}">Age</td>
+                    <td>
+                        <a th:href="@{/pets/{id}(id=${pet.id})}" class="btn btn-sm btn-outline-primary">View</a>
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+            <div th:if="${#lists.isEmpty(pets)}" class="alert alert-info mb-0">
+                No pets registered yet.
+            </div>
+        </div>
+    </div>
+</section>
 </body>
 </html>
