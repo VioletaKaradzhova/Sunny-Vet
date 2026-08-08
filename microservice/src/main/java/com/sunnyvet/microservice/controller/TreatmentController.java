@@ -2,7 +2,6 @@ package com.sunnyvet.microservice.controller;
 
 import com.sunnyvet.microservice.domain.dto.TreatmentDto;
 import com.sunnyvet.microservice.service.TreatmentService;
-import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -27,13 +26,13 @@ public class TreatmentController {
     }
 
     @PostMapping
-    public ResponseEntity<TreatmentDto> recordTreatment(@Valid @RequestBody TreatmentDto treatmentDto) {
+    public ResponseEntity<TreatmentDto> recordTreatment(@RequestBody TreatmentDto treatmentDto) {
         TreatmentDto createdTreatment = treatmentService.createTreatment(treatmentDto);
         return new ResponseEntity<>(createdTreatment, HttpStatus.CREATED);
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<TreatmentDto> updateTreatment(@PathVariable UUID id, @Valid @RequestBody TreatmentDto treatmentDto) {
+    public ResponseEntity<TreatmentDto> updateTreatment(@PathVariable UUID id, @RequestBody TreatmentDto treatmentDto) {
         TreatmentDto updatedTreatment = treatmentService.updateTreatment(id, treatmentDto);
         return ResponseEntity.ok(updatedTreatment);
     }
