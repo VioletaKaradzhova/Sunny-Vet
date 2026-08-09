@@ -38,17 +38,24 @@
 
                             <div class="col-md-6 mb-4">
                                 <label for="petId" class="form-label fw-bold">Pet</label>
-                                <select id="petId" th:field="*{petId}" class="form-select" required>
-                                    <option value="" disabled selected>Select a Pet...</option>
-                                    <option th:each="pet : ${pets}" th:value="${pet.id}" th:text="${pet.name}"></option>
-                                </select>
-                                <div class="text-danger mt-1" th:if="${#fields.hasErrors('petId')}" th:errors="*{petId}"></div>
+
+                                <div th:if="${not #lists.isEmpty(pets)}">
+                                    <select id="petId" th:field="*{petId}" class="form-select" required>
+                                        <option value="" disabled selected>Select a Pet...</option>
+                                        <option th:each="pet : ${pets}" th:value="${pet.id}" th:text="${pet.name}"></option>
+                                    </select>
+                                    <div class="text-danger mt-1" th:if="${#fields.hasErrors('petId')}" th:errors="*{petId}"></div>
+                                </div>
+
+                                <div th:if="${#lists.isEmpty(pets)}" class="alert alert-warning py-2 mb-0 border-warning">
+                                    No pets found. <a th:href="@{/pets/new}" class="alert-link">Add a pet first</a>.
+                                </div>
                             </div>
                         </div>
 
                         <div class="d-flex justify-content-between align-items-center mt-3">
                             <a th:href="@{/appointments}" class="btn btn-outline-secondary">Cancel</a>
-                            <button type="submit" class="btn btn-success px-4">Book Appointment</button>
+                            <button type="submit" class="btn btn-success px-4" th:disabled="${#lists.isEmpty(pets)}">Book Appointment</button>
                         </div>
                     </form>
                 </div>
