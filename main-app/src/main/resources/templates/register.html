@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html th:replace="~{fragments/layout :: layout(~{::title}, ~{::section})}" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <title>Sign Up - Sunny Vet Clinic</title>
+</head>
+<body>
+<section class="container">
+  <div class="row justify-content-center">
+    <div class="col-md-6">
+      <div class="card shadow-sm border-0 mt-4 mb-5">
+        <div class="card-header bg-success text-white text-center py-3">
+          <h4 class="mb-0">Create an Account</h4>
+        </div>
+        <div class="card-body p-4">
+          <div th:if="${param.error}" class="alert alert-danger">
+            Registration failed. Please check your information and try again.
+          </div>
+
+          <form th:action="@{/register}" method="post">
+            <div class="mb-3">
+              <label for="username" class="form-label">Username</label>
+              <input type="text" id="username" name="username" class="form-control" required autofocus />
+            </div>
+            <div class="mb-4">
+              <label for="password" class="form-label">Password</label>
+              <input type="password" id="password" name="password" class="form-control" required minlength="6" />
+            </div>
+            <div class="d-grid mb-3">
+              <button type="submit" class="btn btn-success btn-lg">Sign Up</button>
+            </div>
+            <div class="text-center mt-3">
+              <p class="mb-0">Already have an account? <a th:href="@{/login}" class="text-success fw-bold text-decoration-none">Log in</a></p>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+</body>
+</html>

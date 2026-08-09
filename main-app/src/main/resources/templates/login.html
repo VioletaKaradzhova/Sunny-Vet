@@ -28,8 +28,11 @@
                             <label for="password" class="form-label">Password</label>
                             <input type="password" id="password" name="password" class="form-control" required />
                         </div>
-                        <div class="d-grid">
+                        <div class="d-grid mb-3">
                             <button type="submit" class="btn btn-primary btn-lg">Login</button>
+                        </div>
+                        <div class="text-center mt-3">
+                            <p class="mb-0">Don't have an account yet? <a th:href="@{/register}" class="text-primary fw-bold text-decoration-none">Sign up</a></p>
                         </div>
                     </form>
                 </div>
