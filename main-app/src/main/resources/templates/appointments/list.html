@@ -17,16 +17,20 @@
                 <tr>
                     <th>Date & Time</th>
                     <th>Reason</th>
-                    <th>Doctor ID</th>
-                    <th>Pet ID</th>
+                    <th>Doctor</th>
+                    <th>Pet</th>
                 </tr>
                 </thead>
                 <tbody>
                 <tr th:each="appt : ${appointments}">
-                    <td class="fw-bold" th:text="${appt.appointmentTime}">Date</td>
-                    <td th:text="${appt.reason}">Reason</td>
-                    <td th:text="${appt.doctorId}">Doctor ID</td>
-                    <td th:text="${appt.petId}">Pet ID</td>
+                    <td class="fw-bold" th:text="${#temporals.format(appt.appointmentTime, 'dd-MM-yyyy HH:mm')}"></td>
+                    <td th:text="${appt.reason}"></td>
+                    <td>
+                        <a th:href="@{/doctors/{id}(id=${appt.doctorId})}" th:text="${appt.doctorName}" class="text-decoration-none fw-bold"></a>
+                    </td>
+                    <td>
+                        <a th:href="@{/pets/{id}(id=${appt.petId})}" th:text="${appt.petName}" class="text-decoration-none fw-bold"></a>
+                    </td>
                 </tr>
                 </tbody>
             </table>

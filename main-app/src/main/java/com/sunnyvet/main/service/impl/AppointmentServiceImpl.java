@@ -89,12 +89,16 @@ public class AppointmentServiceImpl implements AppointmentService {
     private AppointmentDto mapToDto(Appointment appointment) {
         AppointmentDto dto = new AppointmentDto();
         dto.setId(appointment.getId());
+
         if (appointment.getPet() != null) {
             dto.setPetId(appointment.getPet().getId());
+            dto.setPetName(appointment.getPet().getName());
         }
         if (appointment.getDoctor() != null) {
             dto.setDoctorId(appointment.getDoctor().getId());
+            dto.setDoctorName(appointment.getDoctor().getFullName());
         }
+
         dto.setAppointmentTime(appointment.getAppointmentTime());
         dto.setReason(appointment.getReason());
         return dto;
