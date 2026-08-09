@@ -1,33 +1,43 @@
 <!DOCTYPE html>
-<html lang="en" xmlns:th="http://www.thymeleaf.org">
-<head th:replace="~{fragments/layout :: head('Book Appointment - SunnyVet Clinic')}"></head>
+<html th:replace="~{fragments/layout :: layout(~{::title}, ~{::section})}" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Book Appointment - Sunny Vet Clinic</title>
+</head>
 <body>
-<header th:replace="~{fragments/layout :: header}"></header>
-<main>
-    <h1>Book an Appointment</h1>
-    <form th:action="@{/appointments}" th:object="${appointment}" method="post">
-        <div>
-            <label for="petId">Pet ID:</label>
-            <input type="text" id="petId" th:field="*{petId}">
-            <span th:if="${#fields.hasErrors('petId')}" th:errors="*{petId}" style="color: red;"></span>
+<section class="container">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card shadow-sm border-0 mt-4 mb-5">
+                <div class="card-header bg-success text-white">
+                    <h4 class="mb-0">Book a New Appointment</h4>
+                </div>
+                <div class="card-body p-4">
+                    <form th:action="@{/appointments}" method="post" th:object="${appointment}">
+                        <div class="mb-3">
+                            <label for="appointmentTime" class="form-label">Date & Time</label>
+                            <input type="datetime-local" id="appointmentTime" th:field="*{appointmentTime}" class="form-control" required />
+                        </div>
+                        <div class="mb-3">
+                            <label for="reason" class="form-label">Reason for Visit</label>
+                            <textarea id="reason" th:field="*{reason}" class="form-control" rows="3" required></textarea>
+                        </div>
+                        <div class="mb-3">
+                            <label for="doctorId" class="form-label">Doctor ID</label>
+                            <input type="text" id="doctorId" th:field="*{doctorId}" class="form-control" placeholder="Enter Doctor UUID" required />
+                        </div>
+                        <div class="mb-4">
+                            <label for="petId" class="form-label">Pet ID</label>
+                            <input type="text" id="petId" th:field="*{petId}" class="form-control" placeholder="Enter Pet UUID" required />
+                        </div>
+                        <div class="d-flex justify-content-between">
+                            <a th:href="@{/appointments}" class="btn btn-outline-secondary">Cancel</a>
+                            <button type="submit" class="btn btn-success">Book Appointment</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
         </div>
-        <div>
-            <label for="doctorId">Doctor ID:</label>
-            <input type="text" id="doctorId" th:field="*{doctorId}">
-            <span th:if="${#fields.hasErrors('doctorId')}" th:errors="*{doctorId}" style="color: red;"></span>
-        </div>
-        <div>
-            <label for="appointmentTime">Date & Time:</label>
-            <input type="datetime-local" id="appointmentTime" th:field="*{appointmentTime}">
-            <span th:if="${#fields.hasErrors('appointmentTime')}" th:errors="*{appointmentTime}" style="color: red;"></span>
-        </div>
-        <div>
-            <label for="reason">Reason:</label>
-            <input type="text" id="reason" th:field="*{reason}">
-            <span th:if="${#fields.hasErrors('reason')}" th:errors="*{reason}" style="color: red;"></span>
-        </div>
-        <button type="submit">Book</button>
-    </form>
-</main>
+    </div>
+</section>
 </body>
 </html>
