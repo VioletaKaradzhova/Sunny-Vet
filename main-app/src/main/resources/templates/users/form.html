@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html th:replace="~{fragments/layout :: layout(~{::title}, ~{::section})}" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Manage User - Sunny Vet Clinic</title>
+</head>
+<body>
+<section class="container mt-5 mb-5">
+    <div class="row justify-content-center">
+        <div class="col-md-6">
+            <div class="card shadow border-0 p-4 rounded-4">
+                <h3 class="mb-4 text-primary fw-bold" th:text="${userEntity.id == null ? 'Add New User' : 'Edit User'}"></h3>
+
+                <form th:action="${userEntity.id == null ? '/users/new' : '/users/edit/' + userEntity.id}" th:object="${userEntity}" method="post">
+
+                    <div class="mb-3">
+                        <label class="form-label fw-bold">Username</label>
+                        <input type="text" th:field="*{username}" class="form-control" required />
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label fw-bold">Full Name</label>
+                        <input type="text" th:field="*{fullName}" class="form-control" required />
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label fw-bold">Email Address</label>
+                        <input type="email" th:field="*{email}" class="form-control" required />
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label fw-bold">Phone Number</label>
+                        <input type="text" th:field="*{phoneNumber}" class="form-control" required />
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label fw-bold">Role</label>
+                        <select th:field="*{role}" class="form-select" required>
+                            <option value="USER">User / Client</option>
+                            <option value="DOCTOR">Doctor</option>
+                            <option value="ADMIN">Administrator</option>
+                        </select>
+                    </div>
+                    <div class="mb-4">
+                        <label class="form-label fw-bold">Password</label>
+                        <input type="password" name="rawPassword" class="form-control" th:placeholder="${userEntity.id == null ? 'Required' : 'Leave blank to keep current password'}" th:required="${userEntity.id == null}" />
+                    </div>
+
+                    <div class="d-flex justify-content-between mt-4 pt-3 border-top">
+                        <a th:href="@{/dashboard}" class="btn btn-outline-secondary px-4">Cancel</a>
+                        <button type="submit" class="btn btn-primary px-5" th:text="${userEntity.id == null ? 'Save User' : 'Update User'}"></button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</section>
+</body>
+</html>

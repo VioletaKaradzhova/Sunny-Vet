@@ -1,10 +1,14 @@
 package com.sunnyvet.main.web;
 
+import com.sunnyvet.main.domain.dto.AppointmentDto;
 import com.sunnyvet.main.domain.dto.PetDto;
+import com.sunnyvet.main.domain.entity.Doctor;
 import com.sunnyvet.main.domain.entity.Owner;
 import com.sunnyvet.main.domain.entity.UserEntity;
+import com.sunnyvet.main.repository.DoctorRepository;
 import com.sunnyvet.main.repository.OwnerRepository;
 import com.sunnyvet.main.repository.UserRepository;
+import com.sunnyvet.main.service.AppointmentService;
 import com.sunnyvet.main.service.PetService;
 import jakarta.validation.Valid;
 import org.springframework.security.core.Authentication;
@@ -12,10 +16,12 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
-import java.util.Comparator;
 
 import java.security.Principal;
+import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
@@ -26,20 +32,21 @@ public class PetWebController {
     private final PetService petService;
     private final OwnerRepository ownerRepository;
     private final UserRepository userRepository;
+    private final AppointmentService appointmentService;
+    private final DoctorRepository doctorRepository;
 
-    public PetWebController(PetService petService, OwnerRepository ownerRepository, UserRepository userRepository) {
+    public PetWebController(PetService petService, OwnerRepository ownerRepository, UserRepository userRepository, AppointmentService appointmentService, DoctorRepository doctorRepository) {
         this.petService = petService;
         this.ownerRepository = ownerRepository;
         this.userRepository = userRepository;
+        this.appointmentService = appointmentService;
+        this.doctorRepository = doctorRepository;
     }
 
     @GetMapping
     public String listPets(Model model, Authentication authentication) {
         if (authentication == null) return "redirect:/login";
-
-        boolean isAdmin = authentication.getAuthorities().stream()
-                .anyMatch(a -> a.getAuthority().contains("ADMIN"));
-
+        boolean isAdmin = authentication.getAuthorities().stream().anyMatch(a -> a.getAuthority().contains("ADMIN"));
         List<PetDto> petsToDisplay;
 
         if (!isAdmin) {
@@ -57,18 +64,19 @@ public class PetWebController {
                             .filter(p -> p.getOwnerId() != null && p.getOwnerId().equals(owner.getId()))
                             .collect(Collectors.toList());
                 } else {
-                    petsToDisplay = List.of();
+                    petsToDisplay = new ArrayList<>();
                 }
             } else {
-                petsToDisplay = List.of();
+                petsToDisplay = new ArrayList<>();
             }
         } else {
             petsToDisplay = petService.getAllPets();
         }
 
-        petsToDisplay.sort(Comparator.comparing(PetDto::getName, String.CASE_INSENSITIVE_ORDER));
+        List<PetDto> sortablePets = new ArrayList<>(petsToDisplay);
+        sortablePets.sort(Comparator.comparing(PetDto::getName, String.CASE_INSENSITIVE_ORDER));
 
-        model.addAttribute("pets", petsToDisplay);
+        model.addAttribute("pets", sortablePets);
         return "pets/list";
     }
 
@@ -119,17 +127,14 @@ public class PetWebController {
     @PostMapping("/edit/{id}")
     public String updatePet(@PathVariable UUID id, @Valid @ModelAttribute("pet") PetDto petDto, BindingResult bindingResult, Authentication auth) {
         if (!verifyOwnership(id, auth)) return "redirect:/pets?error=unauthorized";
-
         if (bindingResult.hasErrors()) {
             if (bindingResult.getFieldErrors().stream().anyMatch(err -> !"ownerId".equals(err.getField()))) {
                 return "pets/new";
             }
         }
-
         petDto.setId(id);
         PetDto existing = petService.getPetById(id);
         petDto.setOwnerId(existing.getOwnerId());
-
         petService.updatePet(id, petDto);
         return "redirect:/pets";
     }
@@ -140,16 +145,38 @@ public class PetWebController {
         return "redirect:/pets";
     }
 
+    @GetMapping("/details/{id}")
+    public String showPetDetails(@PathVariable UUID id, Model model, Authentication auth) {
+        if (!verifyOwnership(id, auth)) return "redirect:/pets?error=unauthorized";
+        model.addAttribute("pet", petService.getPetById(id));
+        return "pets/details";
+    }
+
+    @GetMapping("/{id}/treatments")
+    public String showPetTreatments(@PathVariable UUID id, Model model, Authentication auth) {
+        if (!verifyOwnership(id, auth)) return "redirect:/pets?error=unauthorized";
+
+        model.addAttribute("pet", petService.getPetById(id));
+
+        List<AppointmentDto> treatments = appointmentService.getAllAppointments().stream()
+                .filter(a -> id.equals(a.getPetId()))
+                .sorted(Comparator.comparing(AppointmentDto::getAppointmentTime).reversed())
+                .collect(Collectors.toList());
+
+        Map<UUID, String> docNames = doctorRepository.findAll().stream().collect(Collectors.toMap(Doctor::getId, Doctor::getFullName));
+
+        model.addAttribute("treatments", treatments);
+        model.addAttribute("doctorNames", docNames);
+        return "pets/treatments";
+    }
+
     private boolean verifyOwnership(UUID petId, Authentication auth) {
         boolean isAdmin = auth.getAuthorities().stream().anyMatch(a -> a.getAuthority().contains("ADMIN"));
         if (isAdmin) return true;
-
         PetDto pet = petService.getPetById(petId);
-
         Owner owner = ownerRepository.findAll().stream()
                 .filter(o -> o.getUser() != null && o.getUser().getUsername().equals(auth.getName()))
                 .findFirst().orElse(null);
-
         return owner != null && pet.getOwnerId() != null && pet.getOwnerId().equals(owner.getId());
     }
 }

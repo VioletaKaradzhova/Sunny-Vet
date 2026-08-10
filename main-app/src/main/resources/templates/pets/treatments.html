@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html th:replace="~{fragments/layout :: layout(~{::title}, ~{::section})}" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Pet Treatments - Sunny Vet Clinic</title>
+</head>
+<body>
+<section class="container mt-4 mb-5">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2 class="text-primary fw-bold" th:text="'Treatments for ' + ${pet.name}">Treatments</h2>
+        <a th:href="@{/pets/details/{id}(id=${pet.id})}" class="btn btn-outline-secondary">Back to Pet Details</a>
+    </div>
+
+    <div class="card shadow-sm border-0 rounded-4 overflow-hidden">
+        <div class="table-responsive">
+            <table class="table table-hover mb-0 align-middle">
+                <thead class="table-light">
+                <tr>
+                    <th class="px-4 py-3">Date & Time</th>
+                    <th class="py-3">Attending Doctor</th>
+                    <th class="py-3">Treatment / Reason</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr th:each="treatment : ${treatments}">
+                    <td class="px-4 fw-bold" th:text="${#temporals.format(treatment.appointmentTime, 'MMM dd, yyyy - hh:mm a')}">Date</td>
+
+                    <td>
+                        <span class="badge bg-primary bg-opacity-10 text-primary border border-primary-subtle px-3 py-2 rounded-pill" th:text="${doctorNames[treatment.doctorId]}">Doctor</span>
+                    </td>
+
+                    <td th:text="${treatment.reason}">Reason</td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <div th:if="${#lists.isEmpty(treatments)}" class="p-5 text-center text-muted">
+            <p class="mb-0">No past or upcoming treatments found for this pet.</p>
+        </div>
+    </div>
+</section>
+</body>
+</html>

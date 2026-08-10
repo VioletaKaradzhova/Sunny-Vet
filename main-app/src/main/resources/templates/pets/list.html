@@ -17,6 +17,10 @@
                     <h4 class="card-title text-success fw-bold mb-1" th:text="${pet.name}">Pet Name</h4>
                     <p class="text-muted mb-4" th:text="${pet.species + ' • ' + pet.age + ' yrs'}">Species • Age</p>
 
+                    <div class="mb-2">
+                        <a th:href="@{/pets/details/{id}(id=${pet.id})}" class="btn btn-sm btn-info text-white w-100 fw-bold">Pet Details</a>
+                    </div>
+
                     <div class="d-flex gap-2 justify-content-center">
                         <a th:href="@{/pets/edit/{id}(id=${pet.id})}" class="btn btn-sm btn-outline-secondary w-50">Edit</a>
                         <form th:action="@{/pets/delete/{id}(id=${pet.id})}" method="post" class="m-0 w-50">

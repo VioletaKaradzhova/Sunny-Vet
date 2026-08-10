@@ -60,8 +60,13 @@ public class AppointmentWebController {
     }
 
     @GetMapping("/new")
-    public String showCreateForm(Model model, Principal principal) {
-        model.addAttribute("appointment", new AppointmentDto());
+    public String showCreateForm(@RequestParam(required = false) UUID doctorId, Model model, Principal principal) {
+
+        AppointmentDto dto = new AppointmentDto();
+        if (doctorId != null) {
+            dto.setDoctorId(doctorId);
+        }
+        model.addAttribute("appointment", dto);
         model.addAttribute("doctors", doctorRepository.findAll());
         model.addAttribute("pets", getPrincipalPets(principal.getName()));
         return "appointments/new";

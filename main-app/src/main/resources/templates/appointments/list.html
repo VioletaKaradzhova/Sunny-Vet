@@ -30,7 +30,9 @@
                         <span class="badge bg-primary bg-opacity-10 text-primary border border-primary-subtle px-3 py-2 rounded-pill" th:text="${doctorNames[appointment.doctorId]}">Doctor</span>
                     </td>
 
-                    <td class="fw-bold" th:text="${petNames[appointment.petId]}">Pet Name</td>
+                    <td class="fw-bold">
+                        <a th:href="@{/pets/details/{id}(id=${appointment.petId})}" class="text-decoration-none text-success" th:text="${petNames[appointment.petId]}">Pet Name</a>
+                    </td>
 
                     <td class="text-end px-4">
                         <div class="d-flex gap-2 justify-content-end">

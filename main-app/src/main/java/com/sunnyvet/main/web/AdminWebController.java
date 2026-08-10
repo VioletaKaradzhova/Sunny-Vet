@@ -9,6 +9,10 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import com.sunnyvet.main.domain.entity.UserEntity;
+import com.sunnyvet.main.repository.UserRepository;
+import java.util.Comparator;
+import java.util.List;
 
 import java.util.Map;
 import java.util.UUID;
@@ -21,11 +25,13 @@ public class AdminWebController {
     private final DoctorRepository doctorRepository;
     private final PetRepository petRepository;
     private final AppointmentService appointmentService;
+    private final UserRepository userRepository;
 
-    public AdminWebController(DoctorRepository doctorRepository, PetRepository petRepository, AppointmentService appointmentService) {
+    public AdminWebController(DoctorRepository doctorRepository, PetRepository petRepository, AppointmentService appointmentService, UserRepository userRepository) {
         this.doctorRepository = doctorRepository;
         this.petRepository = petRepository;
         this.appointmentService = appointmentService;
+        this.userRepository = userRepository;
     }
 
     @GetMapping
@@ -39,6 +45,10 @@ public class AdminWebController {
 
         model.addAttribute("doctorNames", docNames);
         model.addAttribute("petNames", petNames);
+
+        List<UserEntity> users = userRepository.findAll();
+        users.sort(Comparator.comparing(UserEntity::getFullName, String.CASE_INSENSITIVE_ORDER));
+        model.addAttribute("users", users);
 
         return "admin/dashboard";
     }
