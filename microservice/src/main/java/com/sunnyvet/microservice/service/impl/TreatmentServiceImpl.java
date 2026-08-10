@@ -29,9 +29,7 @@ public class TreatmentServiceImpl implements TreatmentService {
 
         Treatment treatment = new Treatment();
         treatment.setPetId(dto.getPetId());
-        treatment.setDoctorId(dto.getDoctorId());
         treatment.setDescription(dto.getDescription());
-        treatment.setCost(dto.getCost());
 
         Treatment savedTreatment = treatmentRepository.save(treatment);
         return mapToDto(savedTreatment);
@@ -45,7 +43,6 @@ public class TreatmentServiceImpl implements TreatmentService {
                 .orElseThrow(() -> new ResourceNotFoundException("Treatment not found"));
 
         treatment.setDescription(dto.getDescription());
-        treatment.setCost(dto.getCost());
 
         Treatment updatedTreatment = treatmentRepository.save(treatment);
         return mapToDto(updatedTreatment);
@@ -63,9 +60,7 @@ public class TreatmentServiceImpl implements TreatmentService {
         TreatmentDto dto = new TreatmentDto();
         dto.setId(treatment.getId());
         dto.setPetId(treatment.getPetId());
-        dto.setDoctorId(treatment.getDoctorId());
         dto.setDescription(treatment.getDescription());
-        dto.setCost(treatment.getCost());
         return dto;
     }
 }

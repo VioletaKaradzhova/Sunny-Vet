@@ -6,8 +6,28 @@
 <body>
 <section class="container mt-4 mb-5">
     <div class="d-flex justify-content-between align-items-center mb-4">
-        <h2 class="text-primary fw-bold" th:text="'Treatments for ' + ${pet.name}">Treatments</h2>
+        <h2 class="text-primary fw-bold" th:text="'Medical Record: ' + ${pet.name}">Treatments</h2>
         <a th:href="@{/pets/details/{id}(id=${pet.id})}" class="btn btn-outline-secondary">Back to Pet Details</a>
+    </div>
+
+    <div class="card shadow-sm border-0 rounded-4 p-4 mb-4" th:if="${isAdmin or #request.isUserInRole('DOCTOR')}">
+        <h5 class="text-success fw-bold mb-3">Record New Treatment</h5>
+
+        <form th:action="@{/pets/{id}/treatments(id=${pet.id})}" th:object="${newTreatment}" method="post">
+            <div class="row">
+                <div class="col-md-6 mb-3">
+                    <label class="form-label fw-bold">Treatment Description</label>
+                    <input type="text" th:field="*{description}" class="form-control" required placeholder="e.g. Rabies Vaccination" />
+                </div>
+                <div class="col-md-4 mb-3">
+                    <label class="form-label fw-bold">Medication Provided</label>
+                    <input type="text" th:field="*{medication}" class="form-control" placeholder="e.g. 50mg Amoxicillin" />
+                </div>
+                <div class="col-md-2 mb-3 d-flex align-items-end">
+                    <button type="submit" class="btn btn-success w-100 fw-bold">Save</button>
+                </div>
+            </div>
+        </form>
     </div>
 
     <div class="card shadow-sm border-0 rounded-4 overflow-hidden">
@@ -15,27 +35,56 @@
             <table class="table table-hover mb-0 align-middle">
                 <thead class="table-light">
                 <tr>
-                    <th class="px-4 py-3">Date & Time</th>
-                    <th class="py-3">Attending Doctor</th>
-                    <th class="py-3">Treatment / Reason</th>
+                    <th class="px-4 py-3">Date</th>
+                    <th class="py-3">Description</th>
+                    <th class="py-3">Medication</th>
+                    <th class="text-end px-4 py-3" th:if="${isAdmin or #request.isUserInRole('DOCTOR')}">Actions</th>
                 </tr>
                 </thead>
                 <tbody>
                 <tr th:each="treatment : ${treatments}">
-                    <td class="px-4 fw-bold" th:text="${#temporals.format(treatment.appointmentTime, 'MMM dd, yyyy - hh:mm a')}">Date</td>
+                    <td class="px-4 fw-bold" th:text="${#temporals.format(treatment.treatmentDate, 'MMM dd, yyyy - hh:mm a')}">Date</td>
+                    <td th:text="${treatment.description}">Description</td>
+                    <td><span class="badge bg-secondary bg-opacity-10 text-dark" th:text="${treatment.medication != null and !treatment.medication.isEmpty() ? treatment.medication : 'None'}">Medication</span></td>
 
-                    <td>
-                        <span class="badge bg-primary bg-opacity-10 text-primary border border-primary-subtle px-3 py-2 rounded-pill" th:text="${doctorNames[treatment.doctorId]}">Doctor</span>
+                    <td class="text-end px-4" th:if="${isAdmin or #request.isUserInRole('DOCTOR')}">
+
+                        <button type="button" class="btn btn-sm btn-outline-primary" data-bs-toggle="modal" th:data-bs-target="'#editModal-' + ${treatment.id}">Update</button>
+                        
+                        <div class="modal fade text-start" th:id="'editModal-' + ${treatment.id}" tabindex="-1">
+                            <div class="modal-dialog">
+                                <div class="modal-content">
+                                    <div class="modal-header">
+                                        <h5 class="modal-title fw-bold">Update Treatment</h5>
+                                        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                                    </div>
+                                    <form th:action="@{/pets/{petId}/treatments/{id}/edit(petId=${pet.id}, id=${treatment.id})}" method="post">
+                                        <div class="modal-body">
+                                            <div class="mb-3">
+                                                <label class="form-label fw-bold">Description</label>
+                                                <input type="text" name="description" class="form-control" th:value="${treatment.description}" required>
+                                            </div>
+                                            <div class="mb-3">
+                                                <label class="form-label fw-bold">Medication</label>
+                                                <input type="text" name="medication" class="form-control" th:value="${treatment.medication}">
+                                            </div>
+                                        </div>
+                                        <div class="modal-footer">
+                                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                                            <button type="submit" class="btn btn-primary">Save Changes</button>
+                                        </div>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
                     </td>
-
-                    <td th:text="${treatment.reason}">Reason</td>
                 </tr>
                 </tbody>
             </table>
         </div>
 
         <div th:if="${#lists.isEmpty(treatments)}" class="p-5 text-center text-muted">
-            <p class="mb-0">No past or upcoming treatments found for this pet.</p>
+            <p class="mb-0">No past treatments found for this pet.</p>
         </div>
     </div>
 </section>

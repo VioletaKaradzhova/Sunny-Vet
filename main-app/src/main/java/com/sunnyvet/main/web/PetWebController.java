@@ -1,7 +1,9 @@
 package com.sunnyvet.main.web;
 
+import com.sunnyvet.main.client.MicroserviceClient;
 import com.sunnyvet.main.domain.dto.AppointmentDto;
 import com.sunnyvet.main.domain.dto.PetDto;
+import com.sunnyvet.main.domain.dto.TreatmentDto;
 import com.sunnyvet.main.domain.entity.Doctor;
 import com.sunnyvet.main.domain.entity.Owner;
 import com.sunnyvet.main.domain.entity.UserEntity;
@@ -34,13 +36,15 @@ public class PetWebController {
     private final UserRepository userRepository;
     private final AppointmentService appointmentService;
     private final DoctorRepository doctorRepository;
+    private final MicroserviceClient microserviceClient;
 
-    public PetWebController(PetService petService, OwnerRepository ownerRepository, UserRepository userRepository, AppointmentService appointmentService, DoctorRepository doctorRepository) {
+    public PetWebController(PetService petService, OwnerRepository ownerRepository, UserRepository userRepository, AppointmentService appointmentService, DoctorRepository doctorRepository, MicroserviceClient microserviceClient) {
         this.petService = petService;
         this.ownerRepository = ownerRepository;
         this.userRepository = userRepository;
         this.appointmentService = appointmentService;
         this.doctorRepository = doctorRepository;
+        this.microserviceClient = microserviceClient;
     }
 
     @GetMapping
@@ -158,16 +162,35 @@ public class PetWebController {
 
         model.addAttribute("pet", petService.getPetById(id));
 
-        List<AppointmentDto> treatments = appointmentService.getAllAppointments().stream()
-                .filter(a -> id.equals(a.getPetId()))
-                .sorted(Comparator.comparing(AppointmentDto::getAppointmentTime).reversed())
-                .collect(Collectors.toList());
-
-        Map<UUID, String> docNames = doctorRepository.findAll().stream().collect(Collectors.toMap(Doctor::getId, Doctor::getFullName));
+        List<TreatmentDto> treatments = microserviceClient.getTreatmentsByPetId(id);
 
         model.addAttribute("treatments", treatments);
-        model.addAttribute("doctorNames", docNames);
+        model.addAttribute("newTreatment", new TreatmentDto());
         return "pets/treatments";
+    }
+
+    @PostMapping("/{petId}/treatments")
+    public String addTreatment(@PathVariable UUID petId, @ModelAttribute("newTreatment") TreatmentDto dto, Authentication auth) {
+        boolean isStaff = auth.getAuthorities().stream().anyMatch(a -> a.getAuthority().contains("ADMIN") || a.getAuthority().contains("DOCTOR"));
+        if (!isStaff) return "redirect:/pets?error=unauthorized";
+
+        dto.setPetId(petId);
+
+        microserviceClient.recordTreatment(dto);
+
+        return "redirect:/pets/" + petId + "/treatments";
+    }
+
+    @PostMapping("/{petId}/treatments/{treatmentId}/edit")
+    public String editTreatment(@PathVariable UUID petId, @PathVariable UUID treatmentId, @ModelAttribute("newTreatment") TreatmentDto dto, Authentication auth) {
+        boolean isStaff = auth.getAuthorities().stream().anyMatch(a -> a.getAuthority().contains("ADMIN") || a.getAuthority().contains("DOCTOR"));
+        if (!isStaff) return "redirect:/pets?error=unauthorized";
+
+        dto.setPetId(petId);
+
+        microserviceClient.updateTreatment(treatmentId, dto);
+
+        return "redirect:/pets/" + petId + "/treatments";
     }
 
     private boolean verifyOwnership(UUID petId, Authentication auth) {

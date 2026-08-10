@@ -1,23 +1,24 @@
 package com.sunnyvet.main.client;
 
+import com.sunnyvet.main.domain.dto.TreatmentDto;
 import org.springframework.cloud.openfeign.FeignClient;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
 @FeignClient(name = "treatment-microservice", url = "http://localhost:8081/api/treatments")
 public interface MicroserviceClient {
 
+    @GetMapping("/pet/{petId}")
+    List<TreatmentDto> getTreatmentsByPetId(@PathVariable("petId") UUID petId);
+
     @PostMapping
-    Map<String, Object> recordTreatment(@RequestBody Map<String, Object> treatmentData);
+    TreatmentDto recordTreatment(@RequestBody TreatmentDto treatmentData);
 
     @PutMapping("/{id}")
-    Map<String, Object> updateTreatment(@PathVariable("id") UUID id, @RequestBody Map<String, Object> treatmentData);
+    TreatmentDto updateTreatment(@PathVariable("id") UUID id, @RequestBody TreatmentDto treatmentData);
 
     @GetMapping("/stats")
     Map<String, Object> getTreatmentStats();

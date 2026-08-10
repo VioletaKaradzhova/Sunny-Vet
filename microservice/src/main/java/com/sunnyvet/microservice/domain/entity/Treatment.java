@@ -1,36 +1,37 @@
 package com.sunnyvet.microservice.domain.entity;
 
-import org.springframework.data.annotation.Id;
-import org.springframework.data.mongodb.core.mapping.Document;
-
+import jakarta.persistence.*;
+import java.time.LocalDateTime;
 import java.util.UUID;
 
-@Document(collection = "treatments")
+@Entity
+@Table(name = "treatments")
 public class Treatment {
 
     @Id
+    @GeneratedValue(strategy = GenerationType.UUID)
     private UUID id;
-    private UUID petId;
-    private UUID doctorId;
-    private String description;
-    private Double cost;
 
-    public Treatment() {
-        this.id = UUID.randomUUID();
-    }
+    @Column(nullable = false)
+    private UUID petId;
+
+    @Column(nullable = false)
+    private String description;
+
+    @Column
+    private String medication;
+
+    @Column(nullable = false)
+    private LocalDateTime treatmentDate = LocalDateTime.now();
 
     public UUID getId() { return id; }
     public void setId(UUID id) { this.id = id; }
-
     public UUID getPetId() { return petId; }
     public void setPetId(UUID petId) { this.petId = petId; }
-
-    public UUID getDoctorId() { return doctorId; }
-    public void setDoctorId(UUID doctorId) { this.doctorId = doctorId; }
-
     public String getDescription() { return description; }
     public void setDescription(String description) { this.description = description; }
-
-    public Double getCost() { return cost; }
-    public void setCost(Double cost) { this.cost = cost; }
+    public String getMedication() { return medication; }
+    public void setMedication(String medication) { this.medication = medication; }
+    public LocalDateTime getTreatmentDate() { return treatmentDate; }
+    public void setTreatmentDate(LocalDateTime treatmentDate) { this.treatmentDate = treatmentDate; }
 }

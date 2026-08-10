@@ -1,8 +1,12 @@
 server:
   port: 8081
+
 spring:
-  application:
-    name: treatment-microservice
-  data:
-    mongodb:
-      uri: mongodb://localhost:27017/sunnyvet_treatments
+  datasource:
+    url: jdbc:postgresql://localhost:5433/sunnyvet_micro
+    username: root
+    password: rootpassword
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: true

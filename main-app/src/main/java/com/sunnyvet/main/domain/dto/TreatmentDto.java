@@ -1,4 +1,4 @@
-package com.sunnyvet.microservice.domain.dto;
+package com.sunnyvet.main.domain.dto;
 
 import java.time.LocalDateTime;
 import java.util.UUID;
