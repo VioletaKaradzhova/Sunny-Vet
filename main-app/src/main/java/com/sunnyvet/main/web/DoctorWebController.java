@@ -18,12 +18,6 @@ public class DoctorWebController {
         this.doctorRepository = doctorRepository;
     }
 
-    @GetMapping
-    public String listDoctors(Model model) {
-        model.addAttribute("doctors", doctorRepository.findAll());
-        return "doctors/list";
-    }
-
     @GetMapping("/new")
     public String showCreateForm(Model model) {
         model.addAttribute("doctor", new Doctor());
@@ -33,7 +27,7 @@ public class DoctorWebController {
     @PostMapping
     public String saveDoctor(@ModelAttribute("doctor") Doctor doctor) {
         doctorRepository.save(doctor);
-        return "redirect:/doctors";
+        return "redirect:/#doctors";
     }
 
     @GetMapping("/edit/{id}")
@@ -47,12 +41,12 @@ public class DoctorWebController {
     public String updateDoctor(@PathVariable UUID id, @ModelAttribute("doctor") Doctor doctor) {
         doctor.setId(id);
         doctorRepository.save(doctor);
-        return "redirect:/doctors";
+        return "redirect:/#doctors";
     }
 
     @PostMapping("/delete/{id}")
     public String deleteDoctor(@PathVariable UUID id) {
         doctorRepository.deleteById(id);
-        return "redirect:/doctors";
+        return "redirect:/#doctors";
     }
 }
