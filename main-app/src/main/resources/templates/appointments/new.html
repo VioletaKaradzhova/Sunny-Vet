@@ -55,7 +55,7 @@
 
                         <div class="d-flex justify-content-between align-items-center mt-3">
                             <a th:href="@{/appointments}" class="btn btn-outline-secondary">Cancel</a>
-                            <button type="submit" class="btn btn-success px-4" th:disabled="${#lists.isEmpty(pets)}">Book Appointment</button>
+                            <button type="submit" class="btn btn-success px-4" th:text="${appointment.id == null ? 'Book Appointment' : 'Update Appointment'}"></button>
                         </div>
                     </form>
                 </div>

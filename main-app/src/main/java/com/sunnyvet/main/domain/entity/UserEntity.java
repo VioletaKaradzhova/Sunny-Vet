@@ -30,6 +30,15 @@ public class UserEntity extends BaseEntity implements UserDetails {
     @Column(nullable = false)
     private String password;
 
+    @Column(nullable = false)
+    private String fullName;
+
+    @Column(unique = true, nullable = false)
+    private String email;
+
+    @Column
+    private String phoneNumber;
+
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     private Role role;
@@ -48,6 +57,30 @@ public class UserEntity extends BaseEntity implements UserDetails {
     public void setRole(Role role) { this.role = role; }
     public Set<Permission> getPermissions() { return permissions; }
     public void setPermissions(Set<Permission> permissions) { this.permissions = permissions; }
+
+    public String getFullName() {
+        return fullName;
+    }
+
+    public void setFullName(String fullName) {
+        this.fullName = fullName;
+    }
+
+    public String getEmail() {
+        return email;
+    }
+
+    public void setEmail(String email) {
+        this.email = email;
+    }
+
+    public String getPhoneNumber() {
+        return phoneNumber;
+    }
+
+    public void setPhoneNumber(String phoneNumber) {
+        this.phoneNumber = phoneNumber;
+    }
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {

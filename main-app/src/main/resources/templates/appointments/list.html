@@ -27,8 +27,10 @@
                     <td th:text="${appointment.reason}">Reason</td>
 
                     <td>
-                        <span class="badge bg-primary bg-opacity-10 text-primary border border-primary-subtle px-3 py-2 rounded-pill" th:text="${appointment.doctorId}">Doctor</span>
+                        <span class="badge bg-primary bg-opacity-10 text-primary border border-primary-subtle px-3 py-2 rounded-pill" th:text="${doctorNames[appointment.doctorId]}">Doctor</span>
                     </td>
+
+                    <td class="fw-bold" th:text="${petNames[appointment.petId]}">Pet Name</td>
 
                     <td class="text-end px-4">
                         <div class="d-flex gap-2 justify-content-end">

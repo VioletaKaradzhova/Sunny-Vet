@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html th:replace="~{fragments/layout :: layout(~{::title}, ~{::section})}" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <title>My Profile - Sunny Vet Clinic</title>
+</head>
+<body>
+<section class="container mt-5 mb-5">
+  <div class="row justify-content-center">
+    <div class="col-md-8">
+      <div class="card shadow-sm border-0 rounded-4 p-4">
+        <h3 class="text-primary fw-bold border-bottom pb-3 mb-4">Account Settings</h3>
+
+        <form action="#" method="post">
+          <div class="row">
+            <div class="col-md-6 mb-3">
+              <label class="form-label fw-bold">Username</label>
+              <input type="text" class="form-control" th:value="${username}" disabled>
+              <div class="form-text">Usernames cannot be changed.</div>
+            </div>
+            <div class="col-md-6 mb-3">
+              <label class="form-label fw-bold">Email Address</label>
+              <input type="email" class="form-control" placeholder="Update your email">
+            </div>
+            <div class="col-md-6 mb-3">
+              <label class="form-label fw-bold">Full Name</label>
+              <input type="text" class="form-control" placeholder="Update your name">
+            </div>
+            <div class="col-md-6 mb-4">
+              <label class="form-label fw-bold">Phone Number</label>
+              <input type="text" class="form-control" placeholder="Update your phone number">
+            </div>
+          </div>
+
+          <h5 class="text-muted fw-bold mt-2">Security</h5>
+          <div class="mb-4">
+            <label class="form-label fw-bold">New Password</label>
+            <input type="password" class="form-control" placeholder="Leave blank to keep current password">
+          </div>
+
+          <div class="d-flex justify-content-between border-top pt-4">
+            <button type="button" class="btn btn-outline-danger" data-bs-toggle="modal" data-bs-target="#deleteAccountModal">
+              Delete Account
+            </button>
+            <button type="button" class="btn btn-success px-5">Save Changes</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal fade" id="deleteAccountModal" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content">
+        <div class="modal-header bg-danger text-white">
+          <h5 class="modal-title fw-bold">Request Account Deletion</h5>
+          <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+        </div>
+        <div class="modal-body p-4">
+          <p class="mb-0 text-center">To securely delete your account and all associated records, please contact us directly. An Administrator will assist you shortly.</p>
+          <hr>
+          <p class="mb-1 text-center fw-bold">Email: <a href="mailto:support@sunnyvet.com">support@sunnyvet.com</a></p>
+          <p class="mb-0 text-center fw-bold">Phone: (213) 123-4567</p>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+</body>
+</html>

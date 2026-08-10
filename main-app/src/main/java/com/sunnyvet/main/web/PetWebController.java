@@ -12,6 +12,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
+import java.util.Comparator;
 
 import java.security.Principal;
 import java.util.List;
@@ -36,10 +37,12 @@ public class PetWebController {
     public String listPets(Model model, Authentication authentication) {
         if (authentication == null) return "redirect:/login";
 
-        boolean isUser = authentication.getAuthorities().stream()
-                .anyMatch(a -> a.getAuthority().equals("ROLE_USER") || a.getAuthority().equals("USER"));
+        boolean isAdmin = authentication.getAuthorities().stream()
+                .anyMatch(a -> a.getAuthority().contains("ADMIN"));
 
-        if (isUser) {
+        List<PetDto> petsToDisplay;
+
+        if (!isAdmin) {
             UserEntity user = userRepository.findAll().stream()
                     .filter(u -> u.getUsername().equals(authentication.getName()))
                     .findFirst().orElse(null);
@@ -50,19 +53,22 @@ public class PetWebController {
                         .findFirst().orElse(null);
 
                 if (owner != null) {
-                    List<PetDto> ownerPets = petService.getAllPets().stream()
+                    petsToDisplay = petService.getAllPets().stream()
                             .filter(p -> p.getOwnerId() != null && p.getOwnerId().equals(owner.getId()))
                             .collect(Collectors.toList());
-                    model.addAttribute("pets", ownerPets);
                 } else {
-                    model.addAttribute("pets", List.of());
+                    petsToDisplay = List.of();
                 }
             } else {
-                model.addAttribute("pets", List.of());
+                petsToDisplay = List.of();
             }
         } else {
-            model.addAttribute("pets", petService.getAllPets());
+            petsToDisplay = petService.getAllPets();
         }
+
+        petsToDisplay.sort(Comparator.comparing(PetDto::getName, String.CASE_INSENSITIVE_ORDER));
+
+        model.addAttribute("pets", petsToDisplay);
         return "pets/list";
     }
 
@@ -104,13 +110,16 @@ public class PetWebController {
     }
 
     @GetMapping("/edit/{id}")
-    public String showEditForm(@PathVariable UUID id, Model model) {
+    public String showEditForm(@PathVariable UUID id, Model model, Authentication auth) {
+        if (!verifyOwnership(id, auth)) return "redirect:/pets?error=unauthorized";
         model.addAttribute("pet", petService.getPetById(id));
         return "pets/new";
     }
 
     @PostMapping("/edit/{id}")
-    public String updatePet(@PathVariable UUID id, @Valid @ModelAttribute("pet") PetDto petDto, BindingResult bindingResult) {
+    public String updatePet(@PathVariable UUID id, @Valid @ModelAttribute("pet") PetDto petDto, BindingResult bindingResult, Authentication auth) {
+        if (!verifyOwnership(id, auth)) return "redirect:/pets?error=unauthorized";
+
         if (bindingResult.hasErrors()) {
             if (bindingResult.getFieldErrors().stream().anyMatch(err -> !"ownerId".equals(err.getField()))) {
                 return "pets/new";
@@ -118,7 +127,6 @@ public class PetWebController {
         }
 
         petDto.setId(id);
-
         PetDto existing = petService.getPetById(id);
         petDto.setOwnerId(existing.getOwnerId());
 
@@ -127,8 +135,21 @@ public class PetWebController {
     }
 
     @PostMapping("/delete/{id}")
-    public String deletePet(@PathVariable UUID id) {
-        petService.deletePet(id);
+    public String deletePet(@PathVariable UUID id, Authentication auth) {
+        if (verifyOwnership(id, auth)) petService.deletePet(id);
         return "redirect:/pets";
+    }
+
+    private boolean verifyOwnership(UUID petId, Authentication auth) {
+        boolean isAdmin = auth.getAuthorities().stream().anyMatch(a -> a.getAuthority().contains("ADMIN"));
+        if (isAdmin) return true;
+
+        PetDto pet = petService.getPetById(petId);
+
+        Owner owner = ownerRepository.findAll().stream()
+                .filter(o -> o.getUser() != null && o.getUser().getUsername().equals(auth.getName()))
+                .findFirst().orElse(null);
+
+        return owner != null && pet.getOwnerId() != null && pet.getOwnerId().equals(owner.getId());
     }
 }

@@ -45,16 +45,31 @@ public class DatabaseSeeder implements CommandLineRunner {
     public void run(String... args) {
         if (userRepository.count() == 0) {
 
-            UserEntity adminUser = new UserEntity();
-            adminUser.setUsername("admin");
-            adminUser.setPassword(passwordEncoder.encode("password123"));
-            adminUser.setRole(Role.ADMIN);
-            userRepository.save(adminUser);
+            UserEntity admin = new UserEntity();
+            admin.setUsername("admin");
+            admin.setPassword(passwordEncoder.encode("admin123"));
+            admin.setRole(Role.ADMIN);
+            admin.setEmail("admin@sunnyvet.com");
+            admin.setFullName("System Administrator");
+            admin.setPhoneNumber("555-000-1111");
+            userRepository.save(admin);
+
+            UserEntity admin1 = new UserEntity();
+            admin1.setUsername("admin1");
+            admin1.setPassword(passwordEncoder.encode("admin123"));
+            admin1.setRole(Role.ADMIN);
+            admin1.setEmail("admin1@sunnyvet.com");
+            admin1.setFullName("System Administrator");
+            admin1.setPhoneNumber("555-000-1111");
+            userRepository.save(admin1);
 
             UserEntity doctorUser = new UserEntity();
             doctorUser.setUsername("doctor1");
             doctorUser.setPassword(passwordEncoder.encode("password123"));
             doctorUser.setRole(Role.DOCTOR);
+            doctorUser.setEmail("doctor1@sunnyvet.com");
+            doctorUser.setFullName("Dr. Sarah Jenkins");
+            doctorUser.setPhoneNumber("555-000-2222");
             userRepository.save(doctorUser);
 
             Doctor doctor = new Doctor();
@@ -67,6 +82,9 @@ public class DatabaseSeeder implements CommandLineRunner {
             ownerUser.setUsername("owner1");
             ownerUser.setPassword(passwordEncoder.encode("password123"));
             ownerUser.setRole(Role.USER);
+            ownerUser.setEmail("owner1@email.com");
+            ownerUser.setFullName("Mark Johnson");
+            ownerUser.setPhoneNumber("555-0198");
             userRepository.save(ownerUser);
 
             Owner owner = new Owner();
@@ -88,6 +106,15 @@ public class DatabaseSeeder implements CommandLineRunner {
             appointment.setDoctor(doctor);
             appointment.setPet(pet);
             appointmentRepository.save(appointment);
+
+            UserEntity user = new UserEntity();
+            user.setUsername("client");
+            user.setPassword(passwordEncoder.encode("client123"));
+            user.setRole(Role.USER);
+            user.setEmail("client@email.com");
+            user.setFullName("John Doe");
+            user.setPhoneNumber("555-123-4567");
+            userRepository.save(user);
 
             System.out.println("Test data seeded successfully.");
         }

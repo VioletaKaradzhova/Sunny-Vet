@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html th:replace="~{fragments/layout :: layout(~{::title}, ~{::section})}" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <title>Admin Dashboard - Sunny Vet Clinic</title>
+</head>
+<body>
+<section class="container mt-4 mb-5">
+  <h2 class="text-primary fw-bold mb-4">Clinic Administration</h2>
+
+  <div class="card shadow-sm border-0 mb-5">
+    <div class="card-header bg-white d-flex justify-content-between align-items-center py-3">
+      <h4 class="mb-0 text-success fw-bold">Manage Doctors</h4>
+      <a th:href="@{/doctors/new}" class="btn btn-sm btn-success">+ Add Doctor</a>
+    </div>
+    <div class="card-body">
+      <table class="table align-middle">
+        <thead><tr><th>Name</th><th class="text-end">Actions</th></tr></thead>
+        <tbody>
+        <tr th:each="doctor : ${doctors}">
+          <td th:text="${doctor.fullName}">Name</td>
+          <td class="text-end">
+            <a th:href="@{/doctors/edit/{id}(id=${doctor.id})}" class="btn btn-sm btn-outline-secondary">Edit</a>
+            <form th:action="@{/doctors/delete/{id}(id=${doctor.id})}" method="post" class="d-inline m-0">
+              <button class="btn btn-sm btn-outline-danger" onclick="return confirm('Delete doctor?');">Delete</button>
+            </form>
+          </td>
+        </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <div class="card shadow-sm border-0 mb-5">
+    <div class="card-header bg-white d-flex justify-content-between align-items-center py-3">
+      <h4 class="mb-0 text-success fw-bold">Manage Pets</h4>
+      <a th:href="@{/pets/new}" class="btn btn-sm btn-success">+ Add Pet</a>
+    </div>
+    <div class="card-body">
+      <table class="table align-middle">
+        <thead><tr><th>Pet Name</th><th>Species</th><th>Age</th><th class="text-end">Actions</th></tr></thead>
+        <tbody>
+        <tr th:each="pet : ${pets}">
+          <td class="fw-bold" th:text="${pet.name}">Name</td>
+          <td th:text="${pet.species}">Species</td>
+          <td th:text="${pet.age}">Age</td>
+          <td class="text-end">
+            <a th:href="@{/pets/edit/{id}(id=${pet.id})}" class="btn btn-sm btn-outline-secondary">Edit</a>
+            <form th:action="@{/pets/delete/{id}(id=${pet.id})}" method="post" class="d-inline m-0">
+              <button class="btn btn-sm btn-outline-danger" onclick="return confirm('Delete pet?');">Delete</button>
+            </form>
+          </td>
+        </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <div class="card shadow-sm border-0 mb-5">
+    <div class="card-header bg-white d-flex justify-content-between align-items-center py-3">
+      <h4 class="mb-0 text-success fw-bold">Manage Appointments</h4>
+      <a th:href="@{/appointments/new}" class="btn btn-sm btn-success">+ Book Appointment</a>
+    </div>
+    <div class="card-body">
+      <table class="table align-middle">
+        <thead><tr><th>Date</th><th>Pet</th><th>Doctor</th><th class="text-end">Actions</th></tr></thead>
+        <tbody>
+        <tr th:each="appt : ${appointments}">
+          <td th:text="${#temporals.format(appt.appointmentTime, 'MMM dd, yyyy - hh:mm a')}">Date</td>
+          <td th:text="${petNames[appt.petId]}">Pet</td>
+          <td th:text="${doctorNames[appt.doctorId]}">Doctor</td>
+          <td class="text-end">
+            <a th:href="@{/appointments/edit/{id}(id=${appt.id})}" class="btn btn-sm btn-outline-secondary">Edit</a>
+            <form th:action="@{/appointments/delete/{id}(id=${appt.id})}" method="post" class="d-inline m-0">
+              <button class="btn btn-sm btn-outline-danger" onclick="return confirm('Delete appointment?');">Delete</button>
+            </form>
+          </td>
+        </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</section>
+</body>
+</html>
