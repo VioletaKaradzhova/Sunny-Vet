@@ -4,39 +4,47 @@
     <title>Appointments - Sunny Vet Clinic</title>
 </head>
 <body>
-<section class="container">
+<section class="container mt-4 mb-5">
     <div class="d-flex justify-content-between align-items-center mb-4">
-        <h2 class="text-primary">Appointments</h2>
-        <a th:href="@{/appointments/new}" class="btn btn-success">Book Appointment</a>
+        <h2 class="text-primary fw-bold" th:text="${isClientUser ? 'My Appointments' : 'All Appointments'}">Appointments</h2>
+        <a th:href="@{/appointments/new}" class="btn btn-success fw-bold">+ Book Appointment</a>
     </div>
 
-    <div class="card shadow-sm border-0">
-        <div class="card-body">
-            <table class="table table-hover align-middle">
+    <div class="card shadow-sm border-0 rounded-4 overflow-hidden">
+        <div class="table-responsive">
+            <table class="table table-hover mb-0 align-middle">
                 <thead class="table-light">
                 <tr>
-                    <th>Date & Time</th>
-                    <th>Reason</th>
-                    <th>Doctor</th>
-                    <th>Pet</th>
+                    <th class="px-4 py-3">Date & Time</th>
+                    <th class="py-3">Reason</th>
+                    <th class="py-3">Doctor</th>
+                    <th class="text-end px-4 py-3">Actions</th>
                 </tr>
                 </thead>
                 <tbody>
-                <tr th:each="appt : ${appointments}">
-                    <td class="fw-bold" th:text="${#temporals.format(appt.appointmentTime, 'dd-MM-yyyy HH:mm')}"></td>
-                    <td th:text="${appt.reason}"></td>
+                <tr th:each="appointment : ${appointments}">
+                    <td class="px-4 fw-bold" th:text="${#temporals.format(appointment.appointmentTime, 'MMM dd, yyyy - hh:mm a')}">Date</td>
+                    <td th:text="${appointment.reason}">Reason</td>
+
                     <td>
-                        <a th:href="@{/doctors/{id}(id=${appt.doctorId})}" th:text="${appt.doctorName}" class="text-decoration-none fw-bold"></a>
+                        <span class="badge bg-primary bg-opacity-10 text-primary border border-primary-subtle px-3 py-2 rounded-pill" th:text="${appointment.doctorId}">Doctor</span>
                     </td>
-                    <td>
-                        <a th:href="@{/pets/{id}(id=${appt.petId})}" th:text="${appt.petName}" class="text-decoration-none fw-bold"></a>
+
+                    <td class="text-end px-4">
+                        <div class="d-flex gap-2 justify-content-end">
+                            <a th:href="@{/appointments/edit/{id}(id=${appointment.id})}" class="btn btn-sm btn-outline-secondary">Edit</a>
+                            <form th:action="@{/appointments/delete/{id}(id=${appointment.id})}" method="post" class="m-0">
+                                <button type="submit" class="btn btn-sm btn-outline-danger" onclick="return confirm('Are you sure you want to cancel this appointment?');">Cancel</button>
+                            </form>
+                        </div>
                     </td>
                 </tr>
                 </tbody>
             </table>
-            <div th:if="${#lists.isEmpty(appointments)}" class="alert alert-info mb-0">
-                No appointments scheduled.
-            </div>
+        </div>
+
+        <div th:if="${#lists.isEmpty(appointments)}" class="p-5 text-center text-muted">
+            <p class="mb-0">No appointments found.</p>
         </div>
     </div>
 </section>

@@ -12,7 +12,7 @@
                     <h4 class="mb-0">Book a New Appointment</h4>
                 </div>
                 <div class="card-body p-4">
-                    <form th:action="@{/appointments}" th:object="${appointment}" method="post">
+                    <form th:action="${appointment.id == null ? '/appointments' : '/appointments/edit/' + appointment.id}" th:object="${appointment}" method="post">
 
                         <div class="mb-3">
                             <label for="appointmentTime" class="form-label fw-bold">Date & Time</label>

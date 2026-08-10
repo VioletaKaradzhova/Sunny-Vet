@@ -1,41 +1,35 @@
 <!DOCTYPE html>
 <html th:replace="~{fragments/layout :: layout(~{::title}, ~{::section})}" xmlns:th="http://www.thymeleaf.org">
 <head>
-    <title>Registered Pets - Sunny Vet Clinic</title>
+    <title>Pets - Sunny Vet Clinic</title>
 </head>
 <body>
-<section class="container">
+<section class="container mt-4 mb-5">
     <div class="d-flex justify-content-between align-items-center mb-4">
-        <h2 class="text-primary">Registered Pets</h2>
-        <a th:href="@{/pets/new}" class="btn btn-success">Add New Pet</a>
+        <h2 class="text-primary fw-bold" th:text="${isClientUser ? 'My Pets' : 'All Pets'}">Pets</h2>
+        <a th:href="@{/pets/new}" class="btn btn-success fw-bold">+ Register Pet</a>
     </div>
 
-    <div class="card shadow-sm border-0">
-        <div class="card-body">
-            <table class="table table-hover align-middle">
-                <thead class="table-light">
-                <tr>
-                    <th>Name</th>
-                    <th>Species</th>
-                    <th>Age</th>
-                    <th>Actions</th>
-                </tr>
-                </thead>
-                <tbody>
-                <tr th:each="pet : ${pets}">
-                    <td class="fw-bold" th:text="${pet.name}">Pet Name</td>
-                    <td th:text="${pet.species}">Species</td>
-                    <td th:text="${pet.age}">Age</td>
-                    <td>
-                        <a th:href="@{/pets/{id}(id=${pet.id})}" class="btn btn-sm btn-outline-primary">View</a>
-                    </td>
-                </tr>
-                </tbody>
-            </table>
-            <div th:if="${#lists.isEmpty(pets)}" class="alert alert-info mb-0">
-                No pets registered yet.
+    <div class="row">
+        <div class="col-md-4 mb-4" th:each="pet : ${pets}">
+            <div class="card shadow-sm border-0 h-100 rounded-4 p-3 text-center">
+                <div class="card-body">
+                    <h4 class="card-title text-success fw-bold mb-1" th:text="${pet.name}">Pet Name</h4>
+                    <p class="text-muted mb-4" th:text="${pet.species + ' • ' + pet.age + ' yrs'}">Species • Age</p>
+
+                    <div class="d-flex gap-2 justify-content-center">
+                        <a th:href="@{/pets/edit/{id}(id=${pet.id})}" class="btn btn-sm btn-outline-secondary w-50">Edit</a>
+                        <form th:action="@{/pets/delete/{id}(id=${pet.id})}" method="post" class="m-0 w-50">
+                            <button type="submit" class="btn btn-sm btn-outline-danger w-100" onclick="return confirm('Are you sure you want to remove this pet?');">Delete</button>
+                        </form>
+                    </div>
+                </div>
             </div>
         </div>
+    </div>
+
+    <div th:if="${#lists.isEmpty(pets)}" class="alert alert-info text-center py-4 rounded-4">
+        You haven't registered any pets yet.
     </div>
 </section>
 </body>

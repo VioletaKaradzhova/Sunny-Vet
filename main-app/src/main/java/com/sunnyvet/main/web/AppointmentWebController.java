@@ -10,10 +10,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.ModelAttribute;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.*;
 
 import java.security.Principal;
 import java.util.List;
@@ -36,9 +33,7 @@ public class AppointmentWebController {
 
     @GetMapping
     public String listAppointments(Model model, Authentication authentication) {
-        if (authentication == null) {
-            return "redirect:/login";
-        }
+        if (authentication == null) return "redirect:/login";
 
         boolean isUser = authentication.getAuthorities().stream()
                 .anyMatch(a -> a.getAuthority().equals("ROLE_USER") || a.getAuthority().equals("USER"));
@@ -59,7 +54,6 @@ public class AppointmentWebController {
         } else {
             model.addAttribute("appointments", appointmentService.getAllAppointments());
         }
-
         return "appointments/list";
     }
 
@@ -91,6 +85,36 @@ public class AppointmentWebController {
             return "appointments/new";
         }
         appointmentService.createAppointment(appointmentDto);
+        return "redirect:/appointments";
+    }
+
+    @GetMapping("/edit/{id}")
+    public String showEditForm(@PathVariable UUID id, Model model) {
+        AppointmentDto appointment = appointmentService.getAllAppointments().stream()
+                .filter(a -> a.getId().equals(id))
+                .findFirst().orElseThrow();
+
+        model.addAttribute("appointment", appointment);
+        model.addAttribute("doctors", doctorRepository.findAll());
+        model.addAttribute("pets", petRepository.findAll());
+        return "appointments/new";
+    }
+
+    @PostMapping("/edit/{id}")
+    public String updateAppointment(@PathVariable UUID id, @Valid @ModelAttribute("appointment") AppointmentDto appointmentDto, BindingResult bindingResult, Model model) {
+        if (bindingResult.hasErrors()) {
+            model.addAttribute("doctors", doctorRepository.findAll());
+            model.addAttribute("pets", petRepository.findAll());
+            return "appointments/new";
+        }
+        appointmentDto.setId(id);
+        appointmentService.updateAppointment(id, appointmentDto);
+        return "redirect:/appointments";
+    }
+
+    @PostMapping("/delete/{id}")
+    public String deleteAppointment(@PathVariable UUID id) {
+        appointmentService.deleteAppointment(id);
         return "redirect:/appointments";
     }
 }

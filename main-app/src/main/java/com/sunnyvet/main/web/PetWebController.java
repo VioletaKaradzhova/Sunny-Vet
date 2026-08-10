@@ -11,13 +11,11 @@ import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.ModelAttribute;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.*;
 
 import java.security.Principal;
 import java.util.List;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 @Controller
@@ -36,9 +34,7 @@ public class PetWebController {
 
     @GetMapping
     public String listPets(Model model, Authentication authentication) {
-        if (authentication == null) {
-            return "redirect:/login";
-        }
+        if (authentication == null) return "redirect:/login";
 
         boolean isUser = authentication.getAuthorities().stream()
                 .anyMatch(a -> a.getAuthority().equals("ROLE_USER") || a.getAuthority().equals("USER"));
@@ -46,14 +42,12 @@ public class PetWebController {
         if (isUser) {
             UserEntity user = userRepository.findAll().stream()
                     .filter(u -> u.getUsername().equals(authentication.getName()))
-                    .findFirst()
-                    .orElse(null);
+                    .findFirst().orElse(null);
 
             if (user != null) {
                 Owner owner = ownerRepository.findAll().stream()
                         .filter(o -> o.getUser() != null && o.getUser().getId().equals(user.getId()))
-                        .findFirst()
-                        .orElse(null);
+                        .findFirst().orElse(null);
 
                 if (owner != null) {
                     List<PetDto> ownerPets = petService.getAllPets().stream()
@@ -69,7 +63,6 @@ public class PetWebController {
         } else {
             model.addAttribute("pets", petService.getAllPets());
         }
-
         return "pets/list";
     }
 
@@ -81,27 +74,20 @@ public class PetWebController {
 
     @PostMapping
     public String createPet(@Valid @ModelAttribute("pet") PetDto petDto, BindingResult bindingResult, Principal principal) {
-
         if (bindingResult.hasErrors()) {
-            boolean hasRealErrors = bindingResult.getFieldErrors().stream()
-                    .anyMatch(err -> !"ownerId".equals(err.getField()));
-
-            if (hasRealErrors) {
+            if (bindingResult.getFieldErrors().stream().anyMatch(err -> !"ownerId".equals(err.getField()))) {
                 return "pets/new";
             }
         }
-
         if (principal != null) {
             UserEntity user = userRepository.findAll().stream()
                     .filter(u -> u.getUsername().equals(principal.getName()))
-                    .findFirst()
-                    .orElse(null);
+                    .findFirst().orElse(null);
 
             if (user != null) {
                 Owner owner = ownerRepository.findAll().stream()
                         .filter(o -> o.getUser() != null && o.getUser().getId().equals(user.getId()))
-                        .findFirst()
-                        .orElse(null);
+                        .findFirst().orElse(null);
 
                 if (owner == null) {
                     owner = new Owner();
@@ -110,12 +96,39 @@ public class PetWebController {
                     owner.setUser(user);
                     owner = ownerRepository.save(owner);
                 }
-
                 petDto.setOwnerId(owner.getId());
             }
         }
-
         petService.createPet(petDto);
+        return "redirect:/pets";
+    }
+
+    @GetMapping("/edit/{id}")
+    public String showEditForm(@PathVariable UUID id, Model model) {
+        model.addAttribute("pet", petService.getPetById(id));
+        return "pets/new";
+    }
+
+    @PostMapping("/edit/{id}")
+    public String updatePet(@PathVariable UUID id, @Valid @ModelAttribute("pet") PetDto petDto, BindingResult bindingResult) {
+        if (bindingResult.hasErrors()) {
+            if (bindingResult.getFieldErrors().stream().anyMatch(err -> !"ownerId".equals(err.getField()))) {
+                return "pets/new";
+            }
+        }
+
+        petDto.setId(id);
+
+        PetDto existing = petService.getPetById(id);
+        petDto.setOwnerId(existing.getOwnerId());
+
+        petService.updatePet(id, petDto);
+        return "redirect:/pets";
+    }
+
+    @PostMapping("/delete/{id}")
+    public String deletePet(@PathVariable UUID id) {
+        petService.deletePet(id);
         return "redirect:/pets";
     }
 }
