@@ -4,14 +4,23 @@
     <title>Home - Sunny Vet Clinic</title>
 </head>
 <body>
-<section class="container">
-    <div class="p-5 mb-4 bg-white rounded-3 shadow-sm border">
-        <div class="container-fluid py-5 text-center">
-            <h1 class="display-5 fw-bold text-primary">Welcome to Sunny Vet Clinic</h1>
-            <p class="col-md-8 mx-auto fs-4 text-muted">Providing compassionate and expert care for your furry family members.</p>
-            <div class="mt-4">
-                <a th:href="@{/appointments/new}" class="btn btn-primary btn-lg px-4 me-2">Book an Appointment</a>
-                <a th:href="@{/about}" class="btn btn-outline-secondary btn-lg px-4">Learn More</a>
+<section class="container mt-5 text-center">
+    <h1 class="display-4 text-primary mb-4 fw-bold">Welcome to Sunny Vet Clinic</h1>
+    <p class="lead text-secondary mb-5">Providing compassionate, expert care for your furry family members.</p>
+
+    <div class="row justify-content-center mb-5">
+        <div class="col-md-8">
+            <div class="card shadow border-0 bg-success text-white p-5 rounded-4">
+                <h3 class="mb-3">Ready to schedule a visit?</h3>
+                <div th:if="${!isAuthenticated}">
+                    <p class="mb-4">Create an account today to easily manage your pets and book appointments online.</p>
+                    <a th:href="@{/register}" class="btn btn-light btn-lg mx-2 fw-bold text-success">Join Our Clinic</a>
+                    <a th:href="@{/login}" class="btn btn-outline-light btn-lg mx-2">Sign In</a>
+                </div>
+                <div th:if="${isAuthenticated}">
+                    <p class="mb-4">Head over to the appointments page to schedule your next visit.</p>
+                    <a th:href="@{/appointments/new}" class="btn btn-light btn-lg fw-bold text-success">Book an Appointment</a>
+                </div>
             </div>
         </div>
     </div>

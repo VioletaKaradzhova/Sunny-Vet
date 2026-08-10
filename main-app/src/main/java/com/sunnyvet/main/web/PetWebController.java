@@ -7,6 +7,7 @@ import com.sunnyvet.main.repository.OwnerRepository;
 import com.sunnyvet.main.repository.UserRepository;
 import com.sunnyvet.main.service.PetService;
 import jakarta.validation.Valid;
+import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
@@ -16,6 +17,8 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 
 import java.security.Principal;
+import java.util.List;
+import java.util.stream.Collectors;
 
 @Controller
 @RequestMapping("/pets")
@@ -32,8 +35,41 @@ public class PetWebController {
     }
 
     @GetMapping
-    public String listPets(Model model) {
-        model.addAttribute("pets", petService.getAllPets());
+    public String listPets(Model model, Authentication authentication) {
+        if (authentication == null) {
+            return "redirect:/login";
+        }
+
+        boolean isUser = authentication.getAuthorities().stream()
+                .anyMatch(a -> a.getAuthority().equals("ROLE_USER") || a.getAuthority().equals("USER"));
+
+        if (isUser) {
+            UserEntity user = userRepository.findAll().stream()
+                    .filter(u -> u.getUsername().equals(authentication.getName()))
+                    .findFirst()
+                    .orElse(null);
+
+            if (user != null) {
+                Owner owner = ownerRepository.findAll().stream()
+                        .filter(o -> o.getUser() != null && o.getUser().getId().equals(user.getId()))
+                        .findFirst()
+                        .orElse(null);
+
+                if (owner != null) {
+                    List<PetDto> ownerPets = petService.getAllPets().stream()
+                            .filter(p -> p.getOwnerId() != null && p.getOwnerId().equals(owner.getId()))
+                            .collect(Collectors.toList());
+                    model.addAttribute("pets", ownerPets);
+                } else {
+                    model.addAttribute("pets", List.of());
+                }
+            } else {
+                model.addAttribute("pets", List.of());
+            }
+        } else {
+            model.addAttribute("pets", petService.getAllPets());
+        }
+
         return "pets/list";
     }
 

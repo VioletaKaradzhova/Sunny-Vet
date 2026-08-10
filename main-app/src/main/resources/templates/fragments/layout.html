@@ -1,50 +1,79 @@
 <!DOCTYPE html>
-<html th:fragment="layout (title, content)" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<html th:fragment="layout(title, content)" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title th:replace="${title}">Sunny Vet Clinic</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
 </head>
-<body class="d-flex flex-column min-vh-100 bg-light">
-
-<nav class="navbar navbar-expand-lg navbar-dark bg-primary shadow-sm">
+<body class="bg-light">
+<nav class="navbar navbar-expand-lg navbar-dark bg-primary mb-4 shadow-sm">
     <div class="container">
-        <a class="navbar-brand fw-bold" th:href="@{/}">🐾 Sunny Vet</a>
+        <a class="navbar-brand fw-bold" th:href="@{/}">Sunny Vet Clinic</a>
         <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
             <span class="navbar-toggler-icon"></span>
         </button>
         <div class="collapse navbar-collapse" id="navbarNav">
             <ul class="navbar-nav me-auto">
-                <li class="nav-item"><a class="nav-link" th:href="@{/}">Home</a></li>
-                <li class="nav-item"><a class="nav-link" th:href="@{/about}">About Us</a></li>
-                <li class="nav-item"><a class="nav-link" th:href="@{/pets}">Pets</a></li>
-                <li class="nav-item"><a class="nav-link" th:href="@{/appointments}">Appointments</a></li>
+
+                <li class="nav-item" th:if="${!isAuthenticated or isClientUser}">
+                    <a class="nav-link" th:href="@{/}">Home</a>
+                </li>
+
+                <li class="nav-item" th:if="${isAuthenticated and !isClientUser}">
+                    <a class="nav-link" th:href="@{/}">Dashboard</a>
+                </li>
+
+                <li class="nav-item" th:if="${!isAuthenticated}">
+                    <a class="nav-link" th:href="@{/about}">About Us</a>
+                </li>
+
+                <li class="nav-item" th:if="${isAuthenticated and isClientUser}">
+                    <a class="nav-link" th:href="@{/pets}">My Pets</a>
+                </li>
+
+                <li class="nav-item" th:if="${isAuthenticated and !isClientUser}">
+                    <a class="nav-link" th:href="@{/pets}">Pets</a>
+                </li>
+
+                <li class="nav-item" th:if="${isAuthenticated and isClientUser}">
+                    <a class="nav-link" th:href="@{/appointments}">My Appointments</a>
+                </li>
+
+                <li class="nav-item" th:if="${isAuthenticated and !isClientUser}">
+                    <a class="nav-link" th:href="@{/appointments}">Appointments</a>
+                </li>
+
+                <li class="nav-item" th:if="${!isAuthenticated or isClientUser}">
+                    <a class="nav-link" th:href="@{/doctors}">Doctors</a>
+                </li>
+
             </ul>
             <ul class="navbar-nav">
-                <li class="nav-item" sec:authorize="isAnonymous()">
+
+                <li class="nav-item" th:if="${!isAuthenticated}">
                     <a class="nav-link" th:href="@{/login}">Login</a>
                 </li>
-                <li class="nav-item" sec:authorize="isAuthenticated()">
-                    <form th:action="@{/logout}" method="post" class="d-inline">
-                        <button type="submit" class="btn btn-outline-light btn-sm mt-1">Logout</button>
-                    </form>
+                <li class="nav-item" th:if="${!isAuthenticated}">
+                    <a class="nav-link" th:href="@{/register}">Sign Up</a>
                 </li>
+
+                <li class="nav-item dropdown" th:if="${isAuthenticated}">
+                    <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" th:text="${username}">Account</a>
+                    <ul class="dropdown-menu dropdown-menu-end">
+                        <li>
+                            <form th:action="@{/logout}" method="post" class="m-0 p-0">
+                                <button class="dropdown-item text-danger" type="submit">Logout</button>
+                            </form>
+                        </li>
+                    </ul>
+                </li>
+
             </ul>
         </div>
     </div>
 </nav>
-
-<main class="flex-shrink-0 py-5">
-    <div th:replace="${content}"></div>
-</main>
-
-<footer class="mt-auto py-3 bg-white border-top text-center text-muted">
-    <div class="container">
-        <small>&copy; 2026 Sunny Vet Clinic. All rights reserved.</small>
-    </div>
-</footer>
-
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+<main th:replace="${content}"></main>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>

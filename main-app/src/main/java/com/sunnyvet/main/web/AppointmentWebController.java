@@ -6,6 +6,7 @@ import com.sunnyvet.main.repository.DoctorRepository;
 import com.sunnyvet.main.repository.PetRepository;
 import com.sunnyvet.main.service.AppointmentService;
 import jakarta.validation.Valid;
+import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
@@ -16,6 +17,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 
 import java.security.Principal;
 import java.util.List;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 @Controller
@@ -33,8 +35,31 @@ public class AppointmentWebController {
     }
 
     @GetMapping
-    public String listAppointments(Model model) {
-        model.addAttribute("appointments", appointmentService.getAllAppointments());
+    public String listAppointments(Model model, Authentication authentication) {
+        if (authentication == null) {
+            return "redirect:/login";
+        }
+
+        boolean isUser = authentication.getAuthorities().stream()
+                .anyMatch(a -> a.getAuthority().equals("ROLE_USER") || a.getAuthority().equals("USER"));
+
+        if (isUser) {
+            List<Pet> userPets = petRepository.findAll().stream()
+                    .filter(pet -> pet.getOwner() != null
+                            && pet.getOwner().getUser() != null
+                            && pet.getOwner().getUser().getUsername().equals(authentication.getName()))
+                    .collect(Collectors.toList());
+
+            List<UUID> userPetIds = userPets.stream().map(Pet::getId).collect(Collectors.toList());
+
+            List<AppointmentDto> filtered = appointmentService.getAllAppointments().stream()
+                    .filter(appt -> userPetIds.contains(appt.getPetId()))
+                    .collect(Collectors.toList());
+            model.addAttribute("appointments", filtered);
+        } else {
+            model.addAttribute("appointments", appointmentService.getAllAppointments());
+        }
+
         return "appointments/list";
     }
 
