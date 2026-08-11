@@ -12,6 +12,9 @@ import org.springframework.web.bind.annotation.RequestParam;
 
 import java.security.Principal;
 
+import jakarta.servlet.ServletException;
+import jakarta.servlet.http.HttpServletRequest;
+
 @Controller
 @RequestMapping("/profile")
 public class ProfileWebController {
@@ -40,25 +43,33 @@ public class ProfileWebController {
             @RequestParam String fullName,
             @RequestParam String phoneNumber,
             @RequestParam(required = false) String password,
-            Principal principal) {
+            Principal principal,
+            HttpServletRequest request) throws ServletException {
 
         UserEntity user = userRepository.findAll().stream()
                 .filter(u -> u.getUsername().equals(principal.getName()))
                 .findFirst().orElseThrow();
 
-        user.setUsername(username);
-        user.setEmail(email);
-        user.setFullName(fullName);
-        user.setPhoneNumber(phoneNumber);
+        boolean credentialsChanged = false;
+
+        if (!user.getUsername().equals(username)) {
+            user.setUsername(username);
+            credentialsChanged = true;
+        }
 
         if (password != null && !password.trim().isEmpty()) {
             user.setPassword(passwordEncoder.encode(password));
+            credentialsChanged = true;
         }
 
+        user.setEmail(email);
+        user.setFullName(fullName);
+        user.setPhoneNumber(phoneNumber);
         userRepository.save(user);
 
-        if (!username.equals(principal.getName())) {
-            return "redirect:/logout";
+        if (credentialsChanged) {
+            request.logout();
+            return "redirect:/login?credentialsUpdated=true";
         }
 
         return "redirect:/profile?success";
