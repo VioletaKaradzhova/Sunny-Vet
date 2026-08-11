@@ -8,10 +8,6 @@ services:
       POSTGRES_PASSWORD: rootpassword
     ports:
       - "5433:5432"
-  mongodb:
-    image: mongo:8.3
-    ports:
-      - "27017:27017"
   redis:
     image: redis:8.10.0
     ports:
