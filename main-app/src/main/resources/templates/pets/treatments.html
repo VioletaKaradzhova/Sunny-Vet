@@ -10,7 +10,7 @@
         <a th:href="@{/pets/details/{id}(id=${pet.id})}" class="btn btn-outline-secondary">Back to Pet Details</a>
     </div>
 
-    <div class="card shadow-sm border-0 rounded-4 p-4 mb-4" th:if="${isAdmin or #request.isUserInRole('DOCTOR')}">
+    <div class="card shadow-sm border-0 rounded-4 p-4 mb-4" th:if="${isAdmin or isDoctor}">
         <h5 class="text-success fw-bold mb-3">Record New Treatment</h5>
 
         <form th:action="@{/pets/{id}/treatments(id=${pet.id})}" th:object="${newTreatment}" method="post">
@@ -38,7 +38,7 @@
                     <th class="px-4 py-3">Date</th>
                     <th class="py-3">Description</th>
                     <th class="py-3">Medication</th>
-                    <th class="text-end px-4 py-3" th:if="${isAdmin or #request.isUserInRole('DOCTOR')}">Actions</th>
+                    <th class="text-end px-4 py-3" th:if="${isAdmin or isDoctor}">Actions</th>
                 </tr>
                 </thead>
                 <tbody>
@@ -47,10 +47,10 @@
                     <td th:text="${treatment.description}">Description</td>
                     <td><span class="badge bg-secondary bg-opacity-10 text-dark" th:text="${treatment.medication != null and !treatment.medication.isEmpty() ? treatment.medication : 'None'}">Medication</span></td>
 
-                    <td class="text-end px-4" th:if="${isAdmin or #request.isUserInRole('DOCTOR')}">
+                    <td class="text-end px-4" th:if="${isAdmin or isDoctor}">
 
                         <button type="button" class="btn btn-sm btn-outline-primary" data-bs-toggle="modal" th:data-bs-target="'#editModal-' + ${treatment.id}">Update</button>
-                        
+
                         <div class="modal fade text-start" th:id="'editModal-' + ${treatment.id}" tabindex="-1">
                             <div class="modal-dialog">
                                 <div class="modal-content">

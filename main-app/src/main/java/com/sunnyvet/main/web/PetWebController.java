@@ -50,10 +50,13 @@ public class PetWebController {
     @GetMapping
     public String listPets(Model model, Authentication authentication) {
         if (authentication == null) return "redirect:/login";
-        boolean isAdmin = authentication.getAuthorities().stream().anyMatch(a -> a.getAuthority().contains("ADMIN"));
+
+        boolean isStaff = authentication.getAuthorities().stream()
+                .anyMatch(a -> a.getAuthority().contains("ADMIN") || a.getAuthority().contains("DOCTOR"));
+
         List<PetDto> petsToDisplay;
 
-        if (!isAdmin) {
+        if (!isStaff) {
             UserEntity user = userRepository.findAll().stream()
                     .filter(u -> u.getUsername().equals(authentication.getName()))
                     .findFirst().orElse(null);
@@ -194,8 +197,10 @@ public class PetWebController {
     }
 
     private boolean verifyOwnership(UUID petId, Authentication auth) {
-        boolean isAdmin = auth.getAuthorities().stream().anyMatch(a -> a.getAuthority().contains("ADMIN"));
-        if (isAdmin) return true;
+        boolean isStaff = auth.getAuthorities().stream()
+                .anyMatch(a -> a.getAuthority().contains("ADMIN") || a.getAuthority().contains("DOCTOR"));
+        if (isStaff) return true;
+
         PetDto pet = petService.getPetById(petId);
         Owner owner = ownerRepository.findAll().stream()
                 .filter(o -> o.getUser() != null && o.getUser().getUsername().equals(auth.getName()))

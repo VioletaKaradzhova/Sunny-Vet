@@ -43,7 +43,10 @@ public class SecurityConfig {
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/", "/register", "/login", "/css/**", "/js/**").permitAll()
 
-                        .requestMatchers("/dashboard", "/doctors/new", "/doctors/edit/**", "/doctors/delete/**", "/users/**")
+                        .requestMatchers("/dashboard")
+                        .hasAnyAuthority("ADMIN", "ROLE_ADMIN", "DOCTOR", "ROLE_DOCTOR")
+
+                        .requestMatchers("/doctors/new", "/doctors/edit/**", "/doctors/delete/**", "/users/**")
                         .hasAnyAuthority("ADMIN", "ROLE_ADMIN")
 
                         .anyRequest().authenticated()

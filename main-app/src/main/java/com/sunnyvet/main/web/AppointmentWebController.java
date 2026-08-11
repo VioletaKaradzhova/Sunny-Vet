@@ -38,11 +38,13 @@ public class AppointmentWebController {
     @GetMapping
     public String listAppointments(Model model, Authentication authentication) {
         if (authentication == null) return "redirect:/login";
-        boolean isAdmin = authentication.getAuthorities().stream().anyMatch(a -> a.getAuthority().contains("ADMIN"));
+
+        boolean isStaff = authentication.getAuthorities().stream()
+                .anyMatch(a -> a.getAuthority().contains("ADMIN") || a.getAuthority().contains("DOCTOR"));
 
         List<AppointmentDto> appointments = appointmentService.getAllAppointments();
 
-        if (!isAdmin) {
+        if (!isStaff) {
             List<Pet> userPets = getPrincipalPets(authentication.getName());
             List<UUID> userPetIds = userPets.stream().map(Pet::getId).collect(Collectors.toList());
             appointments = appointments.stream().filter(a -> userPetIds.contains(a.getPetId())).collect(Collectors.toList());
@@ -92,11 +94,12 @@ public class AppointmentWebController {
                 .filter(a -> a.getId().equals(id))
                 .findFirst().orElseThrow();
 
-        boolean isAdmin = auth.getAuthorities().stream().anyMatch(a -> a.getAuthority().contains("ADMIN"));
+        boolean isStaff = auth.getAuthorities().stream()
+                .anyMatch(a -> a.getAuthority().contains("ADMIN") || a.getAuthority().contains("DOCTOR"));
 
         model.addAttribute("appointment", appointment);
         model.addAttribute("doctors", doctorRepository.findAll());
-        model.addAttribute("pets", isAdmin ? petRepository.findAll() : getPrincipalPets(auth.getName()));
+        model.addAttribute("pets", isStaff ? petRepository.findAll() : getPrincipalPets(auth.getName()));
         return "appointments/new";
     }
 
@@ -106,9 +109,11 @@ public class AppointmentWebController {
         validateFutureDate(dto, result);
 
         if (result.hasErrors()) {
-            boolean isAdmin = auth.getAuthorities().stream().anyMatch(a -> a.getAuthority().contains("ADMIN"));
+            boolean isStaff = auth.getAuthorities().stream()
+                    .anyMatch(a -> a.getAuthority().contains("ADMIN") || a.getAuthority().contains("DOCTOR"));
+
             model.addAttribute("doctors", doctorRepository.findAll());
-            model.addAttribute("pets", isAdmin ? petRepository.findAll() : getPrincipalPets(auth.getName()));
+            model.addAttribute("pets", isStaff ? petRepository.findAll() : getPrincipalPets(auth.getName()));
             return "appointments/new";
         }
         dto.setId(id);
@@ -135,10 +140,13 @@ public class AppointmentWebController {
     }
 
     private boolean verifyOwnership(UUID appointmentId, Authentication auth) {
-        boolean isAdmin = auth.getAuthorities().stream().anyMatch(a -> a.getAuthority().contains("ADMIN"));
-        if (isAdmin) return true;
+        boolean isStaff = auth.getAuthorities().stream()
+                .anyMatch(a -> a.getAuthority().contains("ADMIN") || a.getAuthority().contains("DOCTOR"));
+        if (isStaff) return true;
 
-        AppointmentDto appt = appointmentService.getAllAppointments().stream().filter(a -> a.getId().equals(appointmentId)).findFirst().orElseThrow();
+        AppointmentDto appt = appointmentService.getAllAppointments().stream()
+                .filter(a -> a.getId().equals(appointmentId)).findFirst().orElseThrow();
+
         List<UUID> userPetIds = getPrincipalPets(auth.getName()).stream().map(Pet::getId).collect(Collectors.toList());
         return userPetIds.contains(appt.getPetId());
     }
