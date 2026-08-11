@@ -18,6 +18,10 @@ import java.util.Map;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
+import jakarta.servlet.http.HttpServletResponse;
+import java.io.IOException;
+import java.io.PrintWriter;
+
 @Controller
 @RequestMapping("/dashboard")
 public class AdminWebController {
@@ -51,5 +55,25 @@ public class AdminWebController {
         model.addAttribute("users", users);
 
         return "admin/dashboard";
+    }
+
+    @GetMapping("/export/appointments")
+    public void exportAppointmentsToExcel(HttpServletResponse response) throws IOException {
+        response.setContentType("text/csv");
+        response.setHeader("Content-Disposition", "attachment; filename=\"clinic_appointments.csv\"");
+
+        PrintWriter writer = response.getWriter();
+        writer.println("Appointment ID,Date and Time,Reason,Pet ID,Doctor ID");
+
+        appointmentService.getAllAppointments().forEach(appt -> {
+            writer.println(
+                    appt.getId() + "," +
+                            appt.getAppointmentTime() + "," +
+                            "\"" + appt.getReason() + "\"," +
+                            appt.getPetId() + "," +
+                            appt.getDoctorId()
+            );
+        });
+        writer.flush();
     }
 }

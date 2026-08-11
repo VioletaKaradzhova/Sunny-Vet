@@ -58,7 +58,10 @@
   <div class="card shadow-sm border-0 mb-5">
     <div class="card-header bg-white d-flex justify-content-between align-items-center py-3">
       <h4 class="mb-0 text-success fw-bold">Manage Appointments</h4>
-      <a th:href="@{/appointments/new}" class="btn btn-sm btn-success">+ Book Appointment</a>
+      <div>
+        <a th:href="@{/dashboard/export/appointments}" class="btn btn-sm btn-outline-success me-2">Export to Excel</a>
+        <a th:href="@{/appointments/new}" class="btn btn-sm btn-success">+ Book Appointment</a>
+      </div>
     </div>
     <div class="card-body">
       <table class="table align-middle">
