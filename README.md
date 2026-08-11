@@ -7,6 +7,7 @@ Sunny Vet Clinic is a comprehensive, modern web application designed to manage t
 * **Backend Core:** Java 17+, Spring Boot, Spring MVC
 * **Security:** Spring Security (Hybrid authentication: stateless JWT for APIs & stateful Cookie/Session for the Web UI)
 * **Persistence:** Spring Data JPA, Hibernate, PostgreSQL
+* **Caching:** Redis (Configured with JSON serialization for performance and stability)
 * **Frontend:** Thymeleaf, Bootstrap 5, HTML5/CSS3 (with custom SVG aesthetic patterns)
 * **Inter-Service Communication:** Spring Cloud OpenFeign
 
@@ -15,9 +16,11 @@ Sunny Vet Clinic is a comprehensive, modern web application designed to manage t
 * **Dual PostgreSQL Databases:**
   * `sunnyvet` - Stores Users, Owners, Doctors, Pets, and Appointments (Accessed by the Main App).
   * `sunnyvet_micro` - Stores Treatment medical records securely (Accessed strictly by the Microservice).
+* **Redis Caching:** Utilized by the Main Application to cache frequently accessed data in memory, significantly reducing database load and improving response times.
 
 ## Supported Features
 * **Role-Based Access Control (RBAC):** Distinct roles for `USER` (Client), `DOCTOR`, and `ADMIN`, providing strict authorization rules across the UI and backend endpoints.
+* **Performance Optimization:** Implements aggressive Redis caching for high-traffic data retrieval operations (like appointment schedules) with automated cache eviction upon data modification.
 * **Smart UI & Dynamic Routing:** Thymeleaf templates that dynamically adapt to the logged-in user's role (e.g., Doctors bypassing strict client ownership rules to manage clinic-wide data).
 * **Unified Admin Dashboard:** A centralized control panel for administrators to oversee and manage all users, doctors, pets, and appointments.
 * **Robust Validation:** Enforces strict backend constraints, such as future-only appointment dates and secure entity ownership validation to prevent unauthorized URL manipulation.
