@@ -9,9 +9,12 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 @Service
 public class TreatmentServiceImpl implements TreatmentService {
@@ -24,14 +27,27 @@ public class TreatmentServiceImpl implements TreatmentService {
     }
 
     @Override
+    public List<TreatmentDto> getTreatmentsByPetId(UUID petId) {
+        return treatmentRepository.findByPetIdOrderByTreatmentDateDesc(petId)
+                .stream()
+                .map(this::mapToDto)
+                .collect(Collectors.toList());
+    }
+
+    @Override
     public TreatmentDto createTreatment(TreatmentDto dto) {
         logger.info("Executing createTreatment functionality for pet ID: {}", dto.getPetId());
 
         Treatment treatment = new Treatment();
         treatment.setPetId(dto.getPetId());
         treatment.setDescription(dto.getDescription());
+        treatment.setMedication(dto.getMedication());
+        treatment.setTreatmentDate(LocalDateTime.now());
 
         Treatment savedTreatment = treatmentRepository.save(treatment);
+
+        logger.info("Successfully recorded new treatment (ID: {})", savedTreatment.getId());
+
         return mapToDto(savedTreatment);
     }
 
@@ -43,8 +59,12 @@ public class TreatmentServiceImpl implements TreatmentService {
                 .orElseThrow(() -> new ResourceNotFoundException("Treatment not found"));
 
         treatment.setDescription(dto.getDescription());
+        treatment.setMedication(dto.getMedication());
 
         Treatment updatedTreatment = treatmentRepository.save(treatment);
+
+        logger.info("Successfully updated treatment (ID: {})", updatedTreatment.getId());
+
         return mapToDto(updatedTreatment);
     }
 
@@ -61,6 +81,8 @@ public class TreatmentServiceImpl implements TreatmentService {
         dto.setId(treatment.getId());
         dto.setPetId(treatment.getPetId());
         dto.setDescription(treatment.getDescription());
+        dto.setMedication(treatment.getMedication());
+        dto.setTreatmentDate(treatment.getTreatmentDate());
         return dto;
     }
 }

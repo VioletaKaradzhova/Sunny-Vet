@@ -27,10 +27,14 @@ import java.util.Map;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 @Controller
 @RequestMapping("/pets")
 public class PetWebController {
 
+    private static final Logger log = LoggerFactory.getLogger(PetWebController.class);
     private final PetService petService;
     private final OwnerRepository ownerRepository;
     private final UserRepository userRepository;
@@ -121,6 +125,7 @@ public class PetWebController {
             }
         }
         petService.createPet(petDto);
+        log.info("New pet registered: {} (Species: {}) by user: {}", petDto.getName(), petDto.getSpecies(), principal != null ? principal.getName() : "Unknown");
         return "redirect:/pets";
     }
 
@@ -148,7 +153,11 @@ public class PetWebController {
 
     @PostMapping("/delete/{id}")
     public String deletePet(@PathVariable UUID id, Authentication auth) {
-        if (verifyOwnership(id, auth)) petService.deletePet(id);
+        if (verifyOwnership(id, auth)) {petService.deletePet(id);
+            log.info("Pet with ID: {} was deleted by user: {}", id, auth.getName());
+        } else {
+            log.warn("Unauthorized deletion attempt on Pet ID: {} by user: {}", id, auth.getName());
+        }
         return "redirect:/pets";
     }
 
