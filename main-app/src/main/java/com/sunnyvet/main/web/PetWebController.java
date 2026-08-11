@@ -1,10 +1,8 @@
 package com.sunnyvet.main.web;
 
 import com.sunnyvet.main.client.MicroserviceClient;
-import com.sunnyvet.main.domain.dto.AppointmentDto;
 import com.sunnyvet.main.domain.dto.PetDto;
 import com.sunnyvet.main.domain.dto.TreatmentDto;
-import com.sunnyvet.main.domain.entity.Doctor;
 import com.sunnyvet.main.domain.entity.Owner;
 import com.sunnyvet.main.domain.entity.UserEntity;
 import com.sunnyvet.main.repository.DoctorRepository;
@@ -23,7 +21,6 @@ import java.security.Principal;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
-import java.util.Map;
 import java.util.UUID;
 import java.util.stream.Collectors;
 

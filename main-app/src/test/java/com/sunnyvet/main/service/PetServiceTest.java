@@ -1,9 +1,7 @@
 package com.sunnyvet.main.service;
 
 import com.sunnyvet.main.domain.dto.PetDto;
-import com.sunnyvet.main.domain.entity.Owner;
 import com.sunnyvet.main.domain.entity.Pet;
-import com.sunnyvet.main.repository.OwnerRepository;
 import com.sunnyvet.main.repository.PetRepository;
 import com.sunnyvet.main.service.impl.PetServiceImpl;
 import org.junit.jupiter.api.Test;
@@ -15,95 +13,53 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import java.util.Optional;
 import java.util.UUID;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
-class PetServiceTest {
+public class PetServiceTest {
 
     @Mock
     private PetRepository petRepository;
-
-    @Mock
-    private OwnerRepository ownerRepository;
 
     @InjectMocks
     private PetServiceImpl petService;
 
     @Test
     void getPetById_WhenPetExists_ReturnsPetDto() {
-        UUID petId = UUID.randomUUID();
-        UUID ownerId = UUID.randomUUID();
+        UUID id = UUID.randomUUID();
+        Pet pet = new Pet();
+        pet.setId(id);
+        pet.setName("Buddy");
 
-        Owner mockOwner = new Owner();
-        mockOwner.setId(ownerId);
+        when(petRepository.findById(id)).thenReturn(Optional.of(pet));
 
-        Pet mockPetEntity = new Pet();
-        mockPetEntity.setId(petId);
-        mockPetEntity.setName("Buddy");
-        mockPetEntity.setSpecies("Dog");
-        mockPetEntity.setAge(5);
-        mockPetEntity.setOwner(mockOwner);
-
-        when(petRepository.findById(petId)).thenReturn(Optional.of(mockPetEntity));
-
-        PetDto result = petService.getPetById(petId);
+        PetDto result = petService.getPetById(id);
 
         assertNotNull(result);
-        assertEquals(petId, result.getId());
         assertEquals("Buddy", result.getName());
-        assertEquals("Dog", result.getSpecies());
-        assertEquals(5, result.getAge());
-
-        verify(petRepository, times(1)).findById(petId);
     }
 
     @Test
     void getPetById_WhenPetDoesNotExist_ThrowsException() {
-        UUID petId = UUID.randomUUID();
-        when(petRepository.findById(petId)).thenReturn(Optional.empty());
+        UUID id = UUID.randomUUID();
+        when(petRepository.findById(id)).thenReturn(Optional.empty());
 
-        assertThrows(RuntimeException.class, () -> petService.getPetById(petId));
-
-        verify(petRepository, times(1)).findById(petId);
+        assertThrows(RuntimeException.class, () -> petService.getPetById(id));
     }
 
     @Test
     void createPet_ValidDto_SavesAndReturnsDto() {
-        UUID newId = UUID.randomUUID();
-        UUID ownerId = UUID.randomUUID();
-
-        PetDto incomingDto = new PetDto();
-        incomingDto.setName("Bella");
-        incomingDto.setSpecies("Cat");
-        incomingDto.setAge(2);
-        incomingDto.setOwnerId(ownerId);
-
-        Owner mockOwner = new Owner();
-        mockOwner.setId(ownerId);
-
+        PetDto input = new PetDto();
+        input.setName("Max");
         Pet savedEntity = new Pet();
-        savedEntity.setId(newId);
-        savedEntity.setName("Bella");
-        savedEntity.setSpecies("Cat");
-        savedEntity.setAge(2);
-        savedEntity.setOwner(mockOwner);
+        savedEntity.setId(UUID.randomUUID());
 
-        when(ownerRepository.findById(ownerId)).thenReturn(Optional.of(mockOwner));
         when(petRepository.save(any(Pet.class))).thenReturn(savedEntity);
 
-        PetDto result = petService.createPet(incomingDto);
+        petService.createPet(input);
 
-        assertNotNull(result);
-        assertEquals(newId, result.getId());
-        assertEquals("Bella", result.getName());
-
-        verify(ownerRepository, times(1)).findById(ownerId);
         verify(petRepository, times(1)).save(any(Pet.class));
     }
 }

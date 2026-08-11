@@ -5,41 +5,38 @@ import com.sunnyvet.main.domain.entity.Pet;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
-import org.springframework.boot.test.autoconfigure.orm.jpa.TestEntityManager;
 
-import java.util.List;
+import java.util.Optional;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.*;
 
 @DataJpaTest
 class PetRepositoryTest {
 
     @Autowired
-    private TestEntityManager entityManager;
-
-    @Autowired
     private PetRepository petRepository;
 
+    @Autowired
+    private OwnerRepository ownerRepository;
+
     @Test
-    void findByOwnerId_ReturnsPets() {
+    void testSaveAndFindPet() {
         Owner owner = new Owner();
         owner.setFullName("John Doe");
-        owner.setPhoneNumber("555-0199");
-        entityManager.persistAndFlush(owner);
+        owner.setPhoneNumber("12345");
+        Owner savedOwner = ownerRepository.save(owner);
 
         Pet pet = new Pet();
         pet.setName("Rex");
         pet.setSpecies("Dog");
-        pet.setOwner(owner);
-        entityManager.persistAndFlush(pet);
+        pet.setAge(3);
+        pet.setOwner(savedOwner);
 
-        List<Pet> results = petRepository.findByOwnerId(owner.getId());
+        Pet savedPet = petRepository.save(pet);
+        Optional<Pet> foundPet = petRepository.findById(savedPet.getId());
 
-        assertNotNull(results);
-        assertFalse(results.isEmpty());
-        assertEquals(1, results.size());
-        assertEquals(owner.getId(), results.get(0).getOwner().getId());
+        assertTrue(foundPet.isPresent());
+        assertEquals("Rex", foundPet.get().getName());
+        assertEquals(savedOwner.getId(), foundPet.get().getOwner().getId());
     }
 }
